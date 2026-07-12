@@ -9,7 +9,7 @@ import { MainPanel } from './components/mainpanel/mainpanel';
 import { RoomPanel } from './components/roompanel/roompanel';
 import { RoomList } from './components/roomlist/roomlist';
 import { GlobalSettingsPanel } from './components/globalsettings/globalsettings';
-import './App.css';
+import './app.css';
 import './themes/tech-blue-purple.css';
 import './themes/black-gold.css';
 import './themes/gray-white.css';
