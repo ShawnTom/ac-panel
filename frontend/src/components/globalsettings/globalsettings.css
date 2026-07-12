@@ -1,0 +1,211 @@
+.global-settings {
+  display: flex;
+  flex-direction: column;
+  padding: 22px 18px;
+  gap: 18px;
+}
+
+.global-settings__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 4px;
+}
+
+.global-settings__back-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  color: var(--text-primary);
+  backdrop-filter: blur(8px);
+}
+
+.global-settings__back-btn:hover {
+  background: var(--bg-card-hover);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.global-settings__back-btn:active {
+  transform: scale(0.92);
+}
+
+.global-settings__title {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+.global-settings__section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.global-settings__section-header {
+  display: flex;
+  align-items: baseline; /* hint 与 title 底部对齐（baseline 对齐文字基线） */
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.global-settings__section-title {
+  font-size: var(--fs-caption);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.global-settings__section-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.7;
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+
+.global-settings__themes {
+  display: flex;
+  gap: 12px;
+}
+
+.global-settings__theme-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
+  background: rgba(139, 158, 255, 0.08);
+  border: 2px solid transparent;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.global-settings__theme-card--active {
+  border-color: var(--accent-primary);
+  background: rgba(108, 92, 231, 0.18);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.global-settings__theme-preview {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+}
+
+.global-settings__theme-label {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.global-settings__theme-card--active .global-settings__theme-label {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.global-settings__brightness {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.global-settings__brightness-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.global-settings__brightness-label {
+  font-size: var(--fs-label);
+  color: var(--text-secondary);
+  min-width: 56px;
+  font-weight: 500;
+}
+
+.global-settings__slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: var(--dial-track);
+  border-radius: 3px;
+  outline: none;
+}
+
+.global-settings__slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-gradient-cool);
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.global-settings__slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-secondary);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.global-settings__brightness-value {
+  font-size: var(--fs-label);
+  color: var(--text-primary);
+  min-width: 40px;
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.global-settings__section--info {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.global-settings__info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.global-settings__info-label {
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+}
+
+.global-settings__info-value {
+  font-size: var(--fs-label);
+  color: var(--text-primary);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.global-settings__info-value--on {
+  color: var(--power-on);
+  text-shadow: 0 0 8px rgba(85, 239, 196, 0.5);
+}

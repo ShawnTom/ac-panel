@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能空调控制面板 — 项目说明文档</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --card: #1a1d27;
+  --card-hover: #222634;
+  --text: #e8eaf0;
+  --text-2: #9ca3b5;
+  --text-3: #6b7280;
+  --accent: #6c5ce7;
+  --accent-2: #8b9eff;
+  --border: rgba(139,158,255,0.15);
+  --green: #55efc4;
+  --orange: #ffa502;
+  --blue: #5b9cff;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
+.container { max-width:900px; margin:0 auto; padding:40px 24px; }
+h1 { font-size:28px; margin-bottom:8px; }
+h2 { font-size:22px; margin:32px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+h3 { font-size:17px; margin:20px 0 8px; color:var(--accent-2); }
+p { margin-bottom:8px; color:var(--text-2); }
+blockquote { background:var(--card); border-left:3px solid var(--accent); padding:12px 16px; border-radius:8px; margin:12px 0; }
+code { background:var(--card); padding:2px 6px; border-radius:4px; font-size:13px; color:var(--accent-2); }
+pre { background:var(--card); padding:16px; border-radius:8px; overflow-x:auto; margin:12px 0; border:1px solid var(--border); }
+pre code { background:none; padding:0; color:var(--text); }
+table { width:100%; border-collapse:collapse; margin:12px 0; }
+th { background:var(--card); text-align:left; padding:10px 12px; font-size:13px; color:var(--accent-2); border:1px solid var(--border); }
+td { padding:10px 12px; font-size:14px; color:var(--text-2); border:1px solid var(--border); }
+td:first-child { color:var(--text); }
+.card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 20px; margin:12px 0; }
+.badge { display:inline-block; padding:2px 8px; border-radius:6px; font-size:12px; font-weight:600; }
+.badge-green { background:rgba(85,239,196,0.15); color:var(--green); }
+.badge-blue { background:rgba(91,156,255,0.15); color:var(--blue); }
+.badge-orange { background:rgba(255,165,2,0.15); color:var(--orange); }
+.subtitle { color:var(--text-3); font-size:14px; margin-bottom:24px; }
+.tree { background:var(--card); padding:16px 20px; border-radius:8px; font-family:'Courier New',monospace; font-size:13px; line-height:1.8; color:var(--text-2); border:1px solid var(--border); }
+.tree .dir { color:var(--accent-2); }
+.note { background:rgba(91,156,255,0.08); border:1px solid rgba(91,156,255,0.2); border-radius:8px; padding:12px 16px; margin:12px 0; font-size:14px; }
+.note strong { color:var(--blue); }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>智能空调控制面板 — 项目说明文档</h1>
+<p class="subtitle">480×480px 智能家居空调控制面板系统，含前端交互原型和后端 API 预留</p>
+
+<blockquote>本项目为智能家居空调控制面板的原型系统，面板尺寸 <strong>480×480px</strong>，适用于嵌入式触控屏或智能家居中控设备。系统采用前后端分离架构，前端使用 React + TypeScript + Vite，后端使用 Express + TypeScript，当前阶段前端使用 Mock 数据独立运行，后端 API 已预留完整接口供后续对接。</blockquote>
+
+<h2>一、核心功能</h2>
+<table>
+<tr><th>功能</th><th>主控面板（客厅）</th><th>房间面板</th><th>首页</th></tr>
+<tr><td>空调模式切换（制冷/制热/送风）</td><td><span class="badge badge-green">可操作</span></td><td><span class="badge badge-orange">仅展示</span></td><td>—</td></tr>
+<tr><td>温度调节（半圆旋钮，16–30°C）</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td>—</td></tr>
+<tr><td>开关机</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">一键启动/关闭</span></td></tr>
+<tr><td>主题切换（黑金/灰白/蓝紫）</td><td><span class="badge badge-green">设置页</span></td><td>—</td><td>—</td></tr>
+<tr><td>亮度调节（白天/夜间）</td><td><span class="badge badge-green">设置页</span></td><td>—</td><td>—</td></tr>
+<tr><td>室内环境监测</td><td>—</td><td>—</td><td><span class="badge badge-green">温度/湿度/PM2.5/CO2/VOC</span></td></tr>
+<tr><td>滑动导航</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td></tr>
+</table>
+
+<h2>二、技术栈</h2>
+<table>
+<tr><th>层</th><th>技术</th><th>说明</th></tr>
+<tr><td>前端框架</td><td>React 18</td><td>函数组件 + Hooks</td></tr>
+<tr><td>类型系统</td><td>TypeScript 5+</td><td>严格模式（strict: true）</td></tr>
+<tr><td>构建工具</td><td>Vite 6</td><td>开发服务器 + 热更新</td></tr>
+<tr><td>样式方案</td><td>纯 CSS 变量</td><td>三套主题通过 data-theme 属性切换</td></tr>
+<tr><td>后端框架</td><td>Express 4</td><td>RESTful API</td></tr>
+<tr><td>后端语言</td><td>TypeScript</td><td>ts-node 运行</td></tr>
+</table>
+
+<h2>三、项目结构</h2>
+<div class="tree">
+<span class="dir">ac-panel/</span><br>
+├── <span class="dir">frontend/</span>                      # 前端项目<br>
+│   ├── <span class="dir">src/</span><br>
+│   │   ├── <span class="dir">components/</span><br>
+│   │   │   ├── <span class="dir">homepanel/</span>         # 首页（环境监测）<br>
+│   │   │   ├── <span class="dir">mainpanel/</span>         # 主控面板（客厅）<br>
+│   │   │   ├── <span class="dir">roompanel/</span>         # 房间面板<br>
+│   │   │   ├── <span class="dir">roomlist/</span>          # 房间列表<br>
+│   │   │   ├── <span class="dir">temperaturedial/</span>   # 半圆温度旋钮<br>
+│   │   │   ├── <span class="dir">globalsettings/</span>    # 全局设置<br>
+│   │   │   └── <span class="dir">shared/</span>            # 共享容器<br>
+│   │   ├── <span class="dir">hooks/</span>                 # 主题/亮度/滑动/Toast<br>
+│   │   ├── <span class="dir">themes/</span>                # 三套主题 CSS<br>
+│   │   ├── <span class="dir">types/</span>                 # 类型定义<br>
+│   │   ├── <span class="dir">mock/</span>                  # Mock 数据<br>
+│   │   ├── App.tsx                          # 根组件<br>
+│   │   └── main.tsx                         # 入口<br>
+│   ├── index.html<br>
+│   ├── vite.config.ts<br>
+│   └── package.json<br>
+├── <span class="dir">backend/</span>                       # 后端项目<br>
+│   ├── <span class="dir">src/</span><br>
+│   │   ├── <span class="dir">routes/</span>                # Express 路由<br>
+│   │   ├── <span class="dir">controllers/</span>           # 控制器+验证<br>
+│   │   ├── <span class="dir">data/</span>                  # Mock 数据<br>
+│   │   ├── <span class="dir">types/</span>                 # 类型定义<br>
+│   │   └── index.ts                         # 入口<br>
+│   ├── api.md                              # API 文档<br>
+│   └── package.json<br>
+└── README.md                               # 本文档
+</div>
+
+<h2>四、前端核心组件</h2>
+
+<h3>TemperatureDial（温度旋钮）</h3>
+<div class="card">
+<p>• <strong>实现</strong>：SVG 半圆弧 + Pointer Events</p>
+<p>• <strong>交互</strong>：触摸/鼠标拖动，atan2 计算角度映射温度</p>
+<p>• <strong>防冲突</strong>：setPointerCapture + stopPropagation</p>
+<p>• <strong>范围</strong>：16–30°C，整数步进</p>
+<p>• <strong>视觉</strong>：渐变进度弧 + 刻度线 + 旋钮 + 中央大号数字</p>
+</div>
+
+<h3>视图架构</h3>
+<div class="card">
+<p>采用 <strong>track + translateX</strong> 滑动架构，5 个视图横向排列：</p>
+<p><code>首页 → 主控面板 → 房间列表 → 房间面板 → 设置页</code></p>
+<p>• 左滑前进，右滑后退</p>
+<p>• 所有视图同时渲染，CSS transform 控制位置</p>
+<p>• 每个视图占 20% 宽度，track 总宽 500%</p>
+</div>
+
+<h3>主题系统</h3>
+<div class="card">
+<p>三套主题通过 CSS 变量 + <code>data-theme</code> 属性切换：</p>
+<pre><code>[data-theme="tech-blue-purple"] { --bg-primary: #07091a; --accent: #6c5ce7; }
+[data-theme="black-gold"]       { --bg-primary: #0a0a0a; --accent: #D4AF37; }
+[data-theme="gray-white"]       { --bg-primary: #fafafa; --accent: #1a1a1a; }</code></pre>
+<p>切换时 0.35s 平滑过渡，所有颜色使用 CSS 变量，无硬编码色值。</p>
+</div>
+
+<h2>五、后端 API 接口</h2>
+<table>
+<tr><th>方法</th><th>路径</th><th>说明</th></tr>
+<tr><td>GET</td><td>/api/rooms</td><td>获取所有房间</td></tr>
+<tr><td>GET</td><td>/api/rooms/:id</td><td>获取单个房间</td></tr>
+<tr><td>PUT</td><td>/api/rooms/:id</td><td>更新房间（温度/电源）</td></tr>
+<tr><td>PUT</td><td>/api/rooms/:id/mode</td><td>更新模式（仅主控）</td></tr>
+<tr><td>GET</td><td>/api/settings</td><td>获取全局设置</td></tr>
+<tr><td>PUT</td><td>/api/settings</td><td>更新全局设置</td></tr>
+<tr><td>GET</td><td>/api/health</td><td>健康检查</td></tr>
+<tr><td>GET</td><td>/api/time</td><td>获取服务器时间</td></tr>
+</table>
+<p>统一响应格式：<code>{ "code": 0, "msg": "SUCCESS", "data": {...} }</code></p>
+
+<h2>六、交互说明</h2>
+
+<h3>滑动导航</h3>
+<table>
+<tr><th>当前页面</th><th>左滑</th><th>右滑</th></tr>
+<tr><td>首页</td><td>→ 主控面板</td><td>—</td></tr>
+<tr><td>主控面板</td><td>→ 房间列表</td><td>→ 首页</td></tr>
+<tr><td>房间列表</td><td>—</td><td>→ 主控面板</td></tr>
+<tr><td>房间面板</td><td>—</td><td>→ 房间列表</td></tr>
+<tr><td>设置页</td><td>—</td><td>→ 主控面板</td></tr>
+</table>
+
+<h3>一键启动/关闭</h3>
+<div class="card">
+<p>首页右上角按钮，点击后同步所有房间的电源状态：</p>
+<p>• <strong>关机时</strong>：显示"一键启动"</p>
+<p>• <strong>开机时</strong>：显示"一键关闭"（反色填充，图标旋转）</p>
+</div>
+
+<h3>关机状态</h3>
+<div class="card">
+<p>• 主控/房间面板：面板变暗（opacity 0.5），仅显示时间和电源按钮</p>
+<p>• 首页：不变暗，环境数据正常显示</p>
+</div>
+
+<h2>七、本地部署预览</h2>
+
+<div class="note">
+<strong>环境要求：</strong>Node.js 18+，npm 或 yarn
+</div>
+
+<h3>前端启动</h3>
+<pre><code>cd ac-panel/frontend
+npm install
+npm run dev</code></pre>
+<p>访问 http://localhost:5173</p>
+
+<div class="note">
+<strong>注意：</strong>不能直接用浏览器打开 index.html，必须通过 npm run dev 启动开发服务器。
+</div>
+
+<h3>后端启动</h3>
+<pre><code>cd ac-panel/backend
+npm install
+npm run dev</code></pre>
+<p>访问 http://localhost:3001/api/health 验证</p>
+
+<h3>生产构建</h3>
+<pre><code>cd ac-panel/frontend
+npm run build      # 输出到 dist/
+npm run preview    # 预览构建结果</code></pre>
+
+<h2>八、Mock 数据</h2>
+<table>
+<tr><th>房间</th><th>ID</th><th>默认温度</th></tr>
+<tr><td>客厅（主控）</td><td>living-room</td><td>24°C</td></tr>
+<tr><td>主卧</td><td>master-bedroom</td><td>23°C</td></tr>
+<tr><td>次卧</td><td>second-bedroom</td><td>25°C</td></tr>
+<tr><td>书房</td><td>study</td><td>22°C</td></tr>
+<tr><td>厨房</td><td>kitchen</td><td>26°C</td></tr>
+<tr><td>儿童房</td><td>kids-room</td><td>24°C</td></tr>
+</table>
+<p>前后端使用统一的房间 ID，确保接入真实 API 后无缝切换。</p>
+
+<h2>九、后续开发建议</h2>
+<table>
+<tr><th>优先级</th><th>事项</th><th>说明</th></tr>
+<tr><td><span class="badge badge-orange">高</span></td><td>前端 API 服务层</td><td>创建 src/api/，封装 fetch、loading/error</td></tr>
+<tr><td><span class="badge badge-orange">高</span></td><td>WebSocket 实时推送</td><td>实时温度同步</td></tr>
+<tr><td><span class="badge badge-blue">中</span></td><td>用户认证</td><td>JWT/Session</td></tr>
+<tr><td><span class="badge badge-blue">中</span></td><td>数据库持久化</td><td>替换内存 Mock</td></tr>
+<tr><td><span class="badge badge-blue">中</span></td><td>触摸事件调优</td><td>实际设备测试</td></tr>
+<tr><td>低</td><td>响应式适配</td><td>小屏幕缩放</td></tr>
+<tr><td>低</td><td>单元测试</td><td>组件+接口测试</td></tr>
+</table>
+
+</div>
+</body>
+</html>

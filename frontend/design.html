@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>AC Panel · Design Console</title>
+<style>
+  :root {
+    --bg-page: #0a0c14;
+    --bg-panel: #14182a;
+    --bg-card: #1c2038;
+    --bg-hover: #262b48;
+    --border: #2a2f4f;
+    --text: #e8eaf2;
+    --text-2: #9aa0bc;
+    --text-3: #6f749a;
+    --accent: #6c5ce7;
+    --accent-2: #8b9eff;
+    --accent-glow: rgba(108, 92, 231, 0.4);
+    --success: #55efc4;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: var(--bg-page);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+    overflow: hidden;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  /* ===== Left: Controls ===== */
+  .controls {
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 18px 18px 60px;
+  }
+  .controls h1 {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-2);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .controls h1 .reset {
+    font-size: 11px;
+    background: var(--accent);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    letter-spacing: 0.5px;
+  }
+  .controls h1 .reset:hover { background: #7d6df0; }
+  .controls h1 .reset:active { transform: scale(0.96); }
+
+  .group {
+    margin-top: 22px;
+  }
+  .group-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent-2);
+    margin-bottom: 10px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border-color, var(--border));
+  }
+
+  .field {
+    margin-bottom: 12px;
+  }
+  .field-label {
+    font-size: 12px;
+    color: var(--text-2);
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .field-label .val {
+    color: var(--text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  .field input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--bg-hover);
+    border-radius: 2px;
+    outline: none;
+  }
+  .field input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent-2);
+    cursor: pointer;
+    box-shadow: 0 0 6px var(--accent-glow);
+  }
+  .field input[type=color] {
+    width: 100%;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    padding: 2px;
+  }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  .export {
+    margin-top: 24px;
+    padding: 12px;
+    background: var(--bg-card);
+    border: 1px dashed var(--accent);
+    border-radius: 8px;
+  }
+  .export button {
+    width: 100%;
+    padding: 10px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .export button:hover { background: #7d6df0; }
+  .export textarea {
+    width: 100%;
+    margin-top: 8px;
+    height: 80px;
+    background: var(--bg-page);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    resize: none;
+  }
+
+  /* ===== Right: Preview ===== */
+  .preview-area {
+    background:
+      radial-gradient(circle at 50% 30%, var(--bg-glow-1, rgba(108, 92, 231, 0.35)) 0%, transparent 55%),
+      radial-gradient(circle at 20% 80%, var(--bg-glow-2, rgba(91, 156, 255, 0.25)) 0%, transparent 50%),
+      var(--bg-secondary, #0c0f24);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .preview-frame {
+    width: var(--panel-size, 420px);
+    height: var(--panel-size, 420px);
+    border-radius: var(--border-radius-frame, 36px);
+    box-shadow: var(--shadow-card, 0 30px 80px rgba(0,0,0,0.55));
+    background: var(--bg-secondary, #0c0f24);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 18px 22px;
+    gap: 12px;
+    color: var(--text-primary, #ffffff);
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+    transition: background 0.3s ease;
+  }
+  .pv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px;
+    min-height: 42px;
+    flex-shrink: 0;
+  }
+  .pv-room-info {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+  }
+  .pv-room-name {
+    font-size: var(--fs-title, 26px);
+    font-weight: 700;
+    color: var(--text-primary, #fff);
+    letter-spacing: 0.5px;
+  }
+  .pv-time {
+    font-size: var(--fs-body, 18px);
+    font-weight: 600;
+    color: var(--text-secondary, #b8bce0);
+    font-variant-numeric: tabular-nums;
+  }
+  .pv-gear {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--bg-card, rgba(22, 26, 56, 0.55));
+    border: 1px solid var(--border-color, rgba(139, 158, 255, 0.18));
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-primary);
+  }
+  .pv-stage {
+    flex: 1; min-height: 0;
+    position: relative; display: flex;
+    justify-content: center; align-items: flex-start;
+    margin-top: -8px;
+  }
+  .pv-dial {
+    position: absolute; inset: 0;
+    display: flex; justify-content: center; align-items: flex-start;
+    padding-top: 6px;
+    margin-top: -8px;
+  }
+  .pv-dial svg { width: 320px; height: 200px; overflow: visible; filter: drop-shadow(0 0 18px var(--accent-glow, rgba(108, 92, 231, 0.45))); }
+  .pv-dial-center {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    bottom: 6%;
+    display: inline-flex; align-items: baseline; white-space: nowrap;
+    pointer-events: none;
+  }
+  .pv-dial-value {
+    font-size: var(--fs-display, 88px);
+    font-weight: 700; line-height: 0.95;
+    letter-spacing: -2px; color: #fff;
+    text-shadow: 0 0 22px var(--accent-glow);
+    font-variant-numeric: tabular-nums;
+  }
+  .pv-dial-unit {
+    font-size: 28px; color: var(--text-secondary, #b8bce0);
+    margin-left: 6px; align-self: flex-end;
+    line-height: 1; transform: translateY(-6px);
+  }
+  .pv-info-row {
+    display: flex; gap: 10px; padding: 0 4px; flex-shrink: 0; margin-top: 14px;
+  }
+  .pv-info-card {
+    flex: 1; display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; min-height: 52px;
+    background: var(--bg-card, rgba(22, 26, 56, 0.55));
+    border: 1px solid var(--border-color, rgba(139, 158, 255, 0.18));
+    border-radius: 16px; backdrop-filter: blur(10px);
+  }
+  .pv-info-icon {
+    flex-shrink: 0; display: inline-flex; align-items: center;
+    justify-content: center; width: 32px; height: 32px;
+    border-radius: 10px;
+    background: rgba(139, 158, 255, 0.1);
+    color: var(--accent-secondary, #8b9eff);
+  }
+  .pv-info-body { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+  .pv-info-label {
+    font-size: var(--fs-caption, 13px);
+    color: var(--text-secondary, #b8bce0);
+    letter-spacing: 0.4px; line-height: 1.2;
+  }
+  .pv-info-value {
+    font-size: 18px; font-weight: 700;
+    color: var(--text-primary); line-height: 1.2;
+    font-variant-numeric: tabular-nums; letter-spacing: -0.3px;
+  }
+  .pv-control {
+    display: flex; align-items: stretch; gap: 10px;
+    padding: 8px; background: var(--bg-card, rgba(22, 26, 56, 0.55));
+    border: 1px solid var(--border-color, rgba(139, 158, 255, 0.18));
+    border-radius: 999px; backdrop-filter: blur(10px);
+    flex-shrink: 0; width: 100%;
+    transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+  .pv-control--on {
+    border-color: var(--border-strong, rgba(139, 158, 255, 0.35));
+    box-shadow: 0 0 28px var(--accent-glow, rgba(108, 92, 231, 0.55));
+  }
+  .pv-power-pill {
+    flex-shrink: 0; display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+    padding: 0 18px; min-width: 96px; height: 52px;
+    border-radius: 999px;
+    border: 1.5px solid var(--power-on, #55efc4);
+    background: rgba(85, 239, 196, 0.12);
+    color: var(--power-on); font-weight: 700; font-size: var(--fs-body, 18px);
+    letter-spacing: 0.5px; cursor: pointer;
+    box-shadow: 0 0 14px rgba(85, 239, 196, 0.28);
+  }
+  .pv-mode-cluster {
+    flex: 1; display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 6px; min-width: 0;
+  }
+  .pv-mode-chip {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    height: 52px; padding: 0 6px;
+    background: transparent; border: 1px solid transparent;
+    border-radius: 999px; color: var(--text-secondary);
+    cursor: pointer; font-weight: 600;
+    font-size: var(--fs-caption, 13px); letter-spacing: 0.4px;
+  }
+  .pv-mode-chip--active {
+    background: var(--accent-gradient-cool);
+    color: #fff;
+    box-shadow: 0 4px 16px var(--accent-glow);
+  }
+  .pv-mode-chip--active[data-mode="cool"] {
+    background: var(--mode-cool-bg, var(--accent-gradient-cool));
+    box-shadow: 0 4px 16px var(--mode-cool-glow, var(--accent-glow));
+  }
+  .pv-mode-chip--active[data-mode="heat"] {
+    background: var(--mode-heat-bg, var(--accent-gradient-cool));
+    box-shadow: 0 4px 16px var(--mode-heat-glow, var(--accent-glow));
+  }
+  .pv-mode-chip--active[data-mode="wind"] {
+    background: var(--mode-wind-bg, var(--accent-gradient-cool));
+    box-shadow: 0 4px 16px var(--mode-wind-glow, var(--accent-glow));
+  }
+  .pv-power-toggle {
+    position: absolute;
+    right: 20px; top: 20px;
+    z-index: 2;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 8px 16px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .theme-pills {
+    display: flex; gap: 6px; margin-bottom: 12px;
+  }
+  .theme-pill {
+    flex: 1; padding: 8px 6px; text-align: center;
+    border-radius: 6px; cursor: pointer;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-2);
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+  .theme-pill--active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- ===== LEFT: Controls ===== -->
+  <div class="controls">
+    <h1>
+      <span>Design Console</span>
+      <button class="reset" id="resetBtn">复位默认</button>
+    </h1>
+
+    <!-- Theme switcher -->
+    <div class="group">
+      <div class="group-title">主题</div>
+      <div class="theme-pills">
+        <div class="theme-pill theme-pill--active" data-theme="tech-blue-purple">科技蓝紫</div>
+        <div class="theme-pill" data-theme="black-gold">尊贵黑金</div>
+        <div class="theme-pill" data-theme="gray-white">简约黑白</div>
+      </div>
+    </div>
+
+    <!-- Panel size / frame -->
+    <div class="group">
+      <div class="group-title">面板框架</div>
+      <div class="row2">
+        <div class="field">
+          <div class="field-label">面板尺寸 <span class="val" data-out="panelSize">420</span></div>
+          <input type="range" min="320" max="600" value="420" data-css="--panel-size" data-unit="px">
+        </div>
+        <div class="field">
+          <div class="field-label">圆角 <span class="val" data-out="frameRadius">36</span></div>
+          <input type="range" min="0" max="60" value="36" data-css="--border-radius-frame" data-unit="px">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <div class="field-label">内边距 <span class="val" data-out="padX">18</span></div>
+          <input type="range" min="8" max="36" value="18" data-css="--pad-x" data-unit="px">
+        </div>
+        <div class="field">
+          <div class="field-label">垂直间距 <span class="val" data-out="gapY">12</span></div>
+          <input type="range" min="4" max="32" value="12" data-css="--gap-y" data-unit="px">
+        </div>
+      </div>
+    </div>
+
+    <!-- Typography -->
+    <div class="group">
+      <div class="group-title">字体大小</div>
+      <div class="row2">
+        <div class="field">
+          <div class="field-label">展示字号 <span class="val" data-out="fsDisplay">88</span></div>
+          <input type="range" min="60" max="128" value="88" data-css="--fs-display" data-unit="px">
+        </div>
+        <div class="field">
+          <div class="field-label">标题 <span class="val" data-out="fsTitle">26</span></div>
+          <input type="range" min="16" max="40" value="26" data-css="--fs-title" data-unit="px">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <div class="field-label">正文 <span class="val" data-out="fsBody">18</span></div>
+          <input type="range" min="12" max="28" value="18" data-css="--fs-body" data-unit="px">
+        </div>
+        <div class="field">
+          <div class="field-label">标签 <span class="val" data-out="fsLabel">16</span></div>
+          <input type="range" min="11" max="22" value="16" data-css="--fs-label" data-unit="px">
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-label">说明 <span class="val" data-out="fsCaption">13</span></div>
+        <input type="range" min="10" max="18" value="13" data-css="--fs-caption" data-unit="px">
+      </div>
+    </div>
+
+    <!-- Dial params -->
+    <div class="group">
+      <div class="group-title">温度仪表盘</div>
+      <div class="row2">
+        <div class="field">
+          <div class="field-label">圆环半径 <span class="val" data-out="dialR">150</span></div>
+          <input type="range" min="100" max="170" value="150" data-css="--dial-r" data-unit="">
+        </div>
+        <div class="field">
+          <div class="field-label">线宽 <span class="val" data-out="dialSw">14</span></div>
+          <input type="range" min="8" max="22" value="14" data-css="--dial-sw" data-unit="">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <div class="field-label">数字位置 <span class="val" data-out="dialNumOffset">0</span></div>
+          <input type="range" min="-40" max="40" value="0" data-css="--dial-num-offset" data-unit="px">
+        </div>
+        <div class="field">
+          <div class="field-label">单位字号 <span class="val" data-out="dialUnit">28</span></div>
+          <input type="range" min="14" max="44" value="28" data-css="--dial-unit" data-unit="px">
+        </div>
+      </div>
+    </div>
+
+    <!-- Control bar -->
+    <div class="group">
+      <div class="group-title">控制胶囊</div>
+      <div class="row2">
+        <div class="field">
+          <div class="field-label">按钮高度 <span class="val" data-out="pillH">52</span></div>
+          <input type="range" min="40" max="72" value="52" data-css="--pill-h" data-unit="px">
+        </div>
+        <div class="field">
+          <div class="field-label">按钮圆角 <span class="val" data-out="pillR">52</span></div>
+          <input type="range" min="10" max="60" value="52" data-css="--pill-r" data-unit="px">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <div class="field-label">芯片高度 <span class="val" data-out="chipH">52</span></div>
+          <input type="range" min="40" max="72" value="52" data-css="--chip-h" data-unit="px">
+        </div>
+        <div class="field">
+          <div class="field-label">芯片圆角 <span class="val" data-out="chipR">999</span></div>
+          <input type="range" min="10" max="60" value="999" data-css="--chip-r" data-unit="px">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <div class="field-label">卡片圆角 <span class="val" data-out="cardR">16</span></div>
+          <input type="range" min="0" max="32" value="16" data-css="--card-r" data-unit="px">
+        </div>
+        <div class="field">
+          <div class="field-label">动效时长 <span class="val" data-out="tDur">0.4</span></div>
+          <input type="range" min="0.1" max="1" step="0.05" value="0.4" data-css="--t-dur" data-unit="s">
+        </div>
+      </div>
+    </div>
+
+    <!-- Theme palette -->
+    <div class="group">
+      <div class="group-title">主题配色 (当前主题)</div>
+      <div class="row2">
+        <div class="field">
+          <div class="field-label">主色</div>
+          <input type="color" value="#6c5ce7" data-css="--accent">
+        </div>
+        <div class="field">
+          <div class="field-label">副色</div>
+          <input type="color" value="#8b9eff" data-css="--accent-2">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <div class="field-label">文字主色</div>
+          <input type="color" value="#ffffff" data-css="--text-color">
+        </div>
+        <div class="field">
+          <div class="field-label">背景色</div>
+          <input type="color" value="#0c0f24" data-css="--bg-secondary">
+        </div>
+      </div>
+    </div>
+
+    <!-- Export -->
+    <div class="export">
+      <button id="exportBtn">📋 复制 CSS 变量到剪贴板</button>
+      <textarea id="exportArea" readonly>点击上方按钮复制当前所有 CSS 变量</textarea>
+    </div>
+  </div>
+
+  <!-- ===== RIGHT: Preview ===== -->
+  <div class="preview-area">
+    <button class="pv-power-toggle" id="powerToggle">切换开关</button>
+
+    <div class="preview-frame" id="frame">
+      <div class="pv-header">
+        <div class="pv-room-info">
+          <span class="pv-room-name">客厅</span>
+          <span class="pv-time" id="pv-time">14:28</span>
+        </div>
+        <div class="pv-gear">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.39.16.72.4 1 .7"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="pv-stage">
+        <div class="pv-dial" id="dialContainer">
+          <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="dgrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="var(--accent, #6c5ce7)"/>
+                <stop offset="100%" stop-color="var(--accent-2, #8b9eff)"/>
+              </linearGradient>
+            </defs>
+            <!-- track -->
+            <path id="arcTrack" d="M 10 175 A 150 150 0 0 1 310 175" fill="none"
+              stroke="rgba(139,158,255,0.18)" stroke-width="14" stroke-linecap="round"/>
+            <!-- progress arc -->
+            <path id="arcProgress" d="M 10 175 A 150 150 0 0 1 251.2 36.3" fill="none"
+              stroke="url(#dgrad)" stroke-width="14" stroke-linecap="round"/>
+            <!-- knob -->
+            <circle id="knobOuter" cx="251.2" cy="36.3" r="13" fill="var(--accent-2)" opacity="0.35"/>
+            <circle id="knobInner" cx="251.2" cy="36.3" r="9" fill="var(--accent-2)" stroke="#0c0f24" stroke-width="3"/>
+          </svg>
+          <div class="pv-dial-center">
+            <span class="pv-dial-value">24</span>
+            <span class="pv-dial-unit">°C</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pv-info-row" id="infoRow">
+        <div class="pv-info-card">
+          <span class="pv-info-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+            </svg>
+          </span>
+          <div class="pv-info-body">
+            <span class="pv-info-label">当前温度</span>
+            <span class="pv-info-value">26°C</span>
+          </div>
+        </div>
+        <div class="pv-info-card">
+          <span class="pv-info-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+            </svg>
+          </span>
+          <div class="pv-info-body">
+            <span class="pv-info-label">当前湿度</span>
+            <span class="pv-info-value">55%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pv-control pv-control--on" id="control">
+        <div class="pv-power-pill">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>
+          </svg>
+          On
+        </div>
+        <div class="pv-mode-cluster">
+          <button class="pv-mode-chip pv-mode-chip--active" data-mode="cool">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"/></svg>
+            制冷
+          </button>
+          <button class="pv-mode-chip" data-mode="heat">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+            制热
+          </button>
+          <button class="pv-mode-chip" data-mode="wind">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+            通风
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ========== Theme tokens ==========
+  const THEMES = {
+    'tech-blue-purple': {
+      '--accent': '#6c5ce7',
+      '--accent-2': '#8b9eff',
+      '--accent-secondary': '#8b9eff',
+      '--accent-gradient-cool': 'linear-gradient(135deg, #6c5ce7, #5b9cff)',
+      '--accent-glow': 'rgba(108, 92, 231, 0.55)',
+      '--bg-primary': '#07091a',
+      '--bg-secondary': '#0c0f24',
+      '--bg-card': 'rgba(22, 26, 56, 0.55)',
+      '--bg-glow-1': 'rgba(108, 92, 231, 0.35)',
+      '--bg-glow-2': 'rgba(91, 156, 255, 0.25)',
+      '--text-primary': '#ffffff',
+      '--text-secondary': '#b8bce0',
+      '--text-color': '#ffffff',
+      '--border-color': 'rgba(139, 158, 255, 0.18)',
+      '--border-strong': 'rgba(139, 158, 255, 0.35)',
+      '--shadow-card': '0 30px 80px rgba(0, 0, 0, 0.55)',
+      '--power-on': '#55efc4',
+      '--mode-cool-bg': 'linear-gradient(135deg, #5b9cff 0%, #74b9ff 100%)',
+      '--mode-cool-glow': 'rgba(91, 156, 255, 0.55)',
+      '--mode-heat-bg': 'linear-gradient(135deg, #ff7675 0%, #ffa502 100%)',
+      '--mode-heat-glow': 'rgba(255, 118, 117, 0.55)',
+      '--mode-wind-bg': 'linear-gradient(135deg, #81ecec 0%, #a29bfe 100%)',
+      '--mode-wind-glow': 'rgba(129, 236, 236, 0.45)',
+    },
+    'black-gold': {
+      '--accent': '#D4AF37',
+      '--accent-2': '#C9A961',
+      '--accent-secondary': '#C9A961',
+      '--accent-gradient-cool': 'linear-gradient(135deg, #8B7332, #D4AF37)',
+      '--accent-glow': 'rgba(212, 175, 55, 0.5)',
+      '--bg-primary': '#0a0a0a',
+      '--bg-secondary': '#0f0f0f',
+      '--bg-card': 'rgba(28, 28, 28, 0.7)',
+      '--bg-glow-1': 'rgba(212, 175, 55, 0.10)',
+      '--bg-glow-2': 'rgba(201, 169, 97, 0.06)',
+      '--text-primary': '#f5f5f5',
+      '--text-secondary': '#a0a0a0',
+      '--text-color': '#f5f5f5',
+      '--border-color': 'rgba(139, 115, 50, 0.25)',
+      '--border-strong': 'rgba(212, 175, 55, 0.5)',
+      '--shadow-card': '0 24px 70px rgba(0, 0, 0, 0.85)',
+      '--power-on': '#D4AF37',
+      '--mode-cool-bg': 'linear-gradient(135deg, #6FA8DC 0%, #4a6fa5 100%)',
+      '--mode-cool-glow': 'rgba(111, 168, 220, 0.5)',
+      '--mode-heat-bg': 'linear-gradient(135deg, #E89B8A 0%, #d04a3a 100%)',
+      '--mode-heat-glow': 'rgba(232, 155, 138, 0.55)',
+      '--mode-wind-bg': 'linear-gradient(135deg, #8B7332 0%, #D4AF37 50%, #C9A961 100%)',
+      '--mode-wind-glow': 'rgba(212, 175, 55, 0.55)',
+    },
+    'gray-white': {
+      '--accent': '#1a1a1a',
+      '--accent-2': '#4a4e58',
+      '--accent-secondary': '#4a4e58',
+      '--accent-gradient-cool': 'linear-gradient(135deg, #4a4e58, #1a1a1a)',
+      '--accent-glow': 'rgba(26, 26, 26, 0.25)',
+      '--bg-primary': '#fafafa',
+      '--bg-secondary': '#ffffff',
+      '--bg-card': 'rgba(255, 255, 255, 0.9)',
+      '--bg-glow-1': 'rgba(180, 186, 196, 0.08)',
+      '--bg-glow-2': 'rgba(160, 168, 180, 0.05)',
+      '--text-primary': '#1a1a1a',
+      '--text-secondary': '#555a63',
+      '--text-color': '#1a1a1a',
+      '--border-color': 'rgba(0, 0, 0, 0.08)',
+      '--border-strong': 'rgba(0, 0, 0, 0.2)',
+      '--shadow-card': '0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)',
+      '--power-on': '#1a1a1a',
+      '--mode-cool-bg': 'linear-gradient(135deg, #2e7fd9 0%, #4a9eff 100%)',
+      '--mode-cool-glow': 'rgba(46, 127, 217, 0.4)',
+      '--mode-heat-bg': 'linear-gradient(135deg, #d04a3a 0%, #e87a5a 100%)',
+      '--mode-heat-glow': 'rgba(208, 74, 58, 0.4)',
+      '--mode-wind-bg': 'linear-gradient(135deg, #4a4e58 0%, #1a1a1a 100%)',
+      '--mode-wind-glow': 'rgba(26, 26, 26, 0.25)',
+    },
+  };
+
+  const root = document.documentElement;
+  const frame = document.getElementById('frame');
+  let currentTheme = 'tech-blue-purple';
+
+  function applyTheme(name) {
+    currentTheme = name;
+    const tokens = THEMES[name];
+    Object.entries(tokens).forEach(([k, v]) => {
+      root.style.setProperty(k, v);
+    });
+    // Sync color pickers
+    document.querySelector('input[data-css="--accent"]').value = tokens['--accent'];
+    document.querySelector('input[data-css="--accent-2"]').value = tokens['--accent-2'];
+    document.querySelector('input[data-css="--text-color"]').value = tokens['--text-primary'];
+    document.querySelector('input[data-css="--bg-secondary"]').value = tokens['--bg-secondary'];
+    // Toggle pill highlight
+    document.querySelectorAll('.theme-pill').forEach(p => {
+      p.classList.toggle('theme-pill--active', p.dataset.theme === name);
+    });
+    // Page background for gray-white theme
+    document.querySelector('.preview-area').style.background = `
+      radial-gradient(circle at 50% 30%, ${tokens['--bg-glow-1']} 0%, transparent 55%),
+      radial-gradient(circle at 20% 80%, ${tokens['--bg-glow-2']} 0%, transparent 50%),
+      ${tokens['--bg-secondary']}
+    `;
+    document.body.style.background = tokens['--bg-primary'];
+    document.body.style.color = tokens['--text-primary'];
+  }
+
+  // Theme pills
+  document.querySelectorAll('.theme-pill').forEach(p => {
+    p.addEventListener('click', () => applyTheme(p.dataset.theme));
+  });
+
+  // ========== Slider bindings ==========
+  function debounce(fn, ms) {
+    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+  }
+
+  document.querySelectorAll('input[data-css]').forEach(input => {
+    const cssVar = input.dataset.css;
+    const unit = input.dataset.unit || '';
+    const outKey = input.dataset.out;
+    const out = outKey ? document.querySelector(`[data-out="${outKey}"]`) : null;
+    const isSlider = input.type === 'range';
+
+    const update = () => {
+      const val = input.value;
+      root.style.setProperty(cssVar, val + unit);
+      frame.style.setProperty(cssVar, val + unit);
+      if (out) out.textContent = val + (unit || '');
+      if (cssVar === '--dial-r' || cssVar === '--dial-sw' || cssVar === '--dial-num-offset' || cssVar === '--dial-unit') {
+        redrawDial();
+      }
+      if (cssVar === '--pill-h' || cssVar === '--chip-h' || cssVar === '--pill-r' || cssVar === '--chip-r' || cssVar === '--card-r') {
+        applySizeVars();
+      }
+      if (cssVar === '--pad-x' || cssVar === '--gap-y') {
+        frame.style.paddingLeft = frame.style.paddingRight = `var(--pad-x)`;
+        frame.style.gap = `var(--gap-y)`;
+      }
+    };
+    input.addEventListener('input', update);
+    update();
+  });
+
+  function applySizeVars() {
+    const pillH = parseInt(root.style.getPropertyValue('--pill-h')) || 52;
+    const pillR = parseInt(root.style.getPropertyValue('--pill-r')) || 52;
+    const chipH = parseInt(root.style.getPropertyValue('--chip-h')) || 52;
+    const chipR = parseInt(root.style.getPropertyValue('--chip-r')) || 999;
+    const cardR = parseInt(root.style.getPropertyValue('--card-r')) || 16;
+    document.querySelector('.pv-power-pill').style.cssText += `; height:${pillH}px !important; border-radius:${Math.min(pillR, pillH/2)}px !important; min-width:${Math.max(pillH, 80)}px !important;`;
+    document.querySelectorAll('.pv-mode-chip').forEach(el => {
+      el.style.cssText += `; height:${chipH}px !important; border-radius:${Math.min(chipR, chipH/2)}px !important;`;
+    });
+    document.querySelectorAll('.pv-info-card').forEach(el => {
+      el.style.cssText += `; border-radius:${cardR}px !important;`;
+    });
+    document.querySelector('.pv-power-pill svg').parentElement.style.fontSize = `var(--fs-body)`;
+  }
+
+  // ========== Dial redraw ==========
+  function redrawDial() {
+    const r = parseInt(root.style.getPropertyValue('--dial-r')) || 150;
+    const sw = parseInt(root.style.getPropertyValue('--dial-sw')) || 14;
+    const cx = 160, cy = 175;
+    const ratio = 0.62;
+    const startAngle = 180;
+    const endAngle = 180 - ratio * 180;
+    const sx = cx + r * Math.cos(startAngle * Math.PI / 180);
+    const sy = cy - r * Math.sin(startAngle * Math.PI / 180);
+    const ex = cx + r * Math.cos(endAngle * Math.PI / 180);
+    const ey = cy - r * Math.sin(endAngle * Math.PI / 180);
+    const trackD = `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`;
+    const progD = `M ${sx} ${sy} A ${r} ${r} 0 0 1 ${ex} ${ey}`;
+    document.getElementById('arcTrack').setAttribute('d', trackD);
+    document.getElementById('arcTrack').setAttribute('stroke-width', sw);
+    document.getElementById('arcProgress').setAttribute('d', progD);
+    document.getElementById('arcProgress').setAttribute('stroke-width', sw);
+    document.getElementById('knobOuter').setAttribute('cx', ex);
+    document.getElementById('knobOuter').setAttribute('cy', ey);
+    document.getElementById('knobOuter').setAttribute('r', sw * 0.93);
+    document.getElementById('knobInner').setAttribute('cx', ex);
+    document.getElementById('knobInner').setAttribute('cy', ey);
+    document.getElementById('knobInner').setAttribute('r', sw * 0.64);
+  }
+
+  // ========== Power toggle ==========
+  let powered = true;
+  document.getElementById('powerToggle').addEventListener('click', () => {
+    powered = !powered;
+    const control = document.getElementById('control');
+    const infoRow = document.getElementById('infoRow');
+    const pill = control.querySelector('.pv-power-pill');
+    control.classList.toggle('pv-control--on', powered);
+    infoRow.style.display = powered ? 'flex' : 'none';
+    if (powered) {
+      pill.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg> On`;
+      pill.style.color = '';
+      pill.style.borderColor = '';
+    } else {
+      pill.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>`;
+      pill.style.color = 'rgba(255,255,255,0.4)';
+      pill.style.borderColor = 'rgba(255,255,255,0.2)';
+      control.style.width = 'fit-content';
+      control.style.margin = '0 auto';
+      control.style.borderRadius = '32px';
+    }
+  });
+
+  // ========== Active mode chip toggle (preview only) ==========
+  document.querySelectorAll('.pv-mode-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.pv-mode-chip').forEach(c => c.classList.remove('pv-mode-chip--active'));
+      chip.classList.add('pv-mode-chip--active');
+    });
+  });
+
+  // ========== Clock ==========
+  function tick() {
+    const now = new Date();
+    const h = now.getHours().toString().padStart(2, '0');
+    const m = now.getMinutes().toString().padStart(2, '0');
+    document.getElementById('pv-time').textContent = `${h}:${m}`;
+  }
+  tick(); setInterval(tick, 1000);
+
+  // ========== Reset ==========
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    if (!confirm('恢复到默认参数？')) return;
+    location.reload();
+  });
+
+  // ========== Export CSS ==========
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const vars = [];
+    document.querySelectorAll('input[data-css]').forEach(input => {
+      vars.push(`  ${input.dataset.css}: ${input.value}${input.dataset.unit || ''};`);
+    });
+    const themeTokens = Object.entries(THEMES[currentTheme])
+      .map(([k, v]) => `  ${k}: ${v};`)
+      .join('\n');
+    const out = `:root {\n${vars.join('\n')}\n}\n\n[data-theme="${currentTheme}"] {\n${themeTokens}\n}`;
+    const area = document.getElementById('exportArea');
+    area.value = out;
+    area.select();
+    navigator.clipboard.writeText(out).then(() => {
+      const btn = document.getElementById('exportBtn');
+      btn.textContent = '✓ 已复制到剪贴板';
+      setTimeout(() => { btn.textContent = '📋 复制 CSS 变量到剪贴板'; }, 2000);
+    }).catch(() => {
+      alert('复制失败，请手动复制：\n' + out);
+    });
+  });
+
+  // Init
+  applyTheme('tech-blue-purple');
+</script>
+</body>
+</html>

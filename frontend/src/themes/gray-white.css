@@ -1,0 +1,64 @@
+/* ===== Gray White Theme (简约黑白) — 白底黑字版 =====
+   设计灵感：MUJI 无印良品 / Apple iOS 浅色 / 北欧极简
+   特点：纯白底 + 深黑文字，灰色作为唯一过渡色
+   强调"形"而非"色"，用灰阶层级和留白营造高级
+*/
+[data-theme="gray-white"] {
+  /* 背景层：纯白 + 极轻灰阶，避免纯白的刺眼 */
+  --bg-primary: #fafafa;
+  --bg-secondary: #ffffff;
+  /* 卡片底色：比背景略深一档的纯白，靠阴影而非颜色做层次 */
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-card-hover: rgba(248, 248, 250, 1);
+  --bg-glass: rgba(255, 255, 255, 0.75);
+  /* 光晕：极淡的冷光，让"白"有微弱层次（但白底几乎不需要光晕） */
+  --bg-glow-1: rgba(180, 186, 196, 0.08);
+  --bg-glow-2: rgba(160, 168, 180, 0.05);
+
+  /* 文字：高对比纯黑 + 中性深灰 */
+  --text-primary: #1a1a1a;
+  --text-secondary: #555a63;
+  --text-muted: #9aa0aa;
+
+  /* 主色：纯黑到深灰，强调"形"而非"色" */
+  --accent-primary: #1a1a1a;     /* 主黑 — 用于按钮、激活态 */
+  --accent-secondary: #4a4e58;   /* 深灰 — 用于图标、辅助色 */
+  --accent-tertiary: #2a2a2a;    /* 接近黑 */
+  /* 渐变：黑到灰的细腻过渡，模拟阴影而不是金属反光 */
+  --accent-gradient: linear-gradient(135deg, #4a4e58 0%, #1a1a1a 50%, #2a2a2a 100%);
+  --accent-gradient-cool: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  --accent-glow: rgba(26, 26, 26, 0.18);
+
+  /* 边框：浅灰描边，几乎不抢眼 */
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.2);
+
+  /* 仪表盘轨道：极浅灰 */
+  --dial-track: rgba(0, 0, 0, 0.06);
+  --dial-progress: linear-gradient(90deg, #4a4e58, #1a1a1a);
+
+  /* 阴影：浅阴影，靠"投影"做层次（白底需要更克制的阴影） */
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.06),
+                 0 1px 3px rgba(0, 0, 0, 0.04);
+
+  /* 模式色：白底黑字主题下，所有模式用克制的深色 + 一个区分色 */
+  --color-cool: #2e7fd9;         /* 制冷：深蓝，跟黑色文字对比 */
+  --color-heat: #d04a3a;         /* 制热：深红 */
+  --color-wind: #4a4e58;         /* 通风：深灰 */
+  --color-auto: #2e9b6a;         /* 自动：深绿（避免亮绿在白底上太跳） */
+
+  /* 电源指示：纯黑边框（开机态）+ 中性灰（关闭态） */
+  --power-on: #1a1a1a;
+  --power-off: #c8ccd4;
+
+  /* 模式激活态专属色：
+     简约黑白主题以"形"为主，"色"为辅
+     cool 用冷蓝、heat 用暖红，作为唯一的彩色点缀
+     wind 用中性灰，符合极简基调 */
+  --mode-cool-bg: linear-gradient(135deg, #2e7fd9 0%, #4a9eff 100%);
+  --mode-cool-glow: rgba(46, 127, 217, 0.4);
+  --mode-heat-bg: linear-gradient(135deg, #d04a3a 0%, #e87a5a 100%);
+  --mode-heat-glow: rgba(208, 74, 58, 0.4);
+  --mode-wind-bg: linear-gradient(135deg, #4a4e58 0%, #1a1a1a 100%);
+  --mode-wind-glow: rgba(26, 26, 26, 0.25);
+}

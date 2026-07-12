@@ -1,0 +1,156 @@
+import { useState, useEffect } from 'react';
+import type { Room, GlobalSettings, ACMode } from './types';
+import { mockRooms, mockGlobalSettings } from './mock/data';
+import { useTheme } from './hooks/usetheme';
+import { useBrightness } from './hooks/usebrightness';
+import { useSwipe } from './hooks/useswipe';
+import { HomePanel } from './components/homepanel/homepanel';
+import { MainPanel } from './components/mainpanel/mainpanel';
+import { RoomPanel } from './components/roompanel/roompanel';
+import { RoomList } from './components/roomlist/roomlist';
+import { GlobalSettingsPanel } from './components/globalsettings/globalsettings';
+import './App.css';
+import './themes/tech-blue-purple.css';
+import './themes/black-gold.css';
+import './themes/gray-white.css';
+
+type View = 'home' | 'main' | 'room-list' | 'room' | 'settings';
+
+// 视图顺序：首页(左滑) | 主面板 | 房间列表(右滑) | 房间面板 | 设置
+const viewOrder: View[] = ['home', 'main', 'room-list', 'room', 'settings'];
+
+function App() {
+  const [rooms, setRooms] = useState<Room[]>(mockRooms);
+  const [globalSettings, setGlobalSettings] = useState<GlobalSettings>(mockGlobalSettings);
+  const [currentView, setCurrentView] = useState<View>('main');
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+
+  const { setTheme } = useTheme(globalSettings.theme);
+  const { brightnessConfig, updateConfig, isNight } = useBrightness(globalSettings.brightness);
+
+  // 主题切换
+  useEffect(() => {
+    setTheme(globalSettings.theme);
+  }, [globalSettings.theme, setTheme]);
+
+  // 滑动导航：
+  // 左滑(手指右→左) = 前进到右侧屏
+  // 右滑(手指左→右) = 回退到左侧屏
+  const swipeHandlers = useSwipe({
+    onSwipeLeft: () => {
+      // 前进
+      if (currentView === 'home') setCurrentView('main');
+      else if (currentView === 'main') setCurrentView('room-list');
+      // room-list → room 需要已选中房间，不自动跳转
+    },
+    onSwipeRight: () => {
+      // 回退
+      if (currentView === 'main') setCurrentView('home');
+      else if (currentView === 'room-list') setCurrentView('main');
+      else if (currentView === 'room') {
+        setSelectedRoomId(null);
+        setCurrentView('room-list');
+      }
+      else if (currentView === 'settings') setCurrentView('main');
+    },
+  });
+
+  const handleRoomSelect = (roomId: string) => {
+    setSelectedRoomId(roomId);
+    setCurrentView('room');
+  };
+
+  const handleRoomUpdate = (updatedRoom: Room) => {
+    setRooms(prev => prev.map(r => (r.id === updatedRoom.id ? updatedRoom : r)));
+  };
+
+  const handleGlobalUpdate = (updates: Partial<GlobalSettings>) => {
+    setGlobalSettings(prev => ({ ...prev, ...updates }));
+  };
+
+  const handleBrightnessUpdate = (day: number, night: number) => {
+    updateConfig({ day, night });
+    handleGlobalUpdate({ brightness: { day, night } });
+  };
+
+  const handlePowerToggle = () => {
+    const newPower = !globalSettings.power;
+    handleGlobalUpdate({ power: newPower });
+    // 一键启动/关闭：同步所有房间的电源状态
+    setRooms(prev => prev.map(r => ({ ...r, power: newPower })));
+  };
+
+  const handleModeChange = (mode: ACMode) => {
+    handleGlobalUpdate({ currentMode: mode });
+  };
+
+  const selectedRoom = rooms.find(r => r.id === selectedRoomId) || null;
+  const mainRoom = rooms.find(r => r.id === 'living-room') || rooms[0];
+
+  const currentIndex = viewOrder.indexOf(currentView);
+
+  return (
+    <div className="app" {...swipeHandlers}>
+      <div
+        className="app__track"
+        style={{ transform: `translateX(-${currentIndex * 20}%)` }}
+      >
+        <div className="app__view">
+          <HomePanel rooms={rooms} settings={globalSettings} onPowerToggle={handlePowerToggle} />
+        </div>
+        <div className="app__view">
+          <MainPanel
+            room={mainRoom}
+            settings={globalSettings}
+            onModeChange={handleModeChange}
+            onPowerToggle={handlePowerToggle}
+            onSettingsClick={() => setCurrentView('settings')}
+            onRoomUpdate={handleRoomUpdate}
+          />
+        </div>
+        <div className="app__view">
+          <RoomList
+            rooms={rooms}
+            onRoomSelect={handleRoomSelect}
+            onRoomPowerToggle={(room) => handleRoomUpdate({ ...room, power: !room.power })}
+            onBack={() => setCurrentView('main')}
+          />
+        </div>
+        <div className="app__view">
+          {selectedRoom && (
+            <RoomPanel
+              room={selectedRoom}
+              settings={globalSettings}
+              globalPower={globalSettings.power}
+              modeDisabled
+              onBack={() => {
+                setSelectedRoomId(null);
+                setCurrentView('room-list');
+              }}
+              onModeChange={handleModeChange}
+              onPowerToggle={() => {
+                if (!globalSettings.power) {
+                  handleGlobalUpdate({ power: true });
+                }
+                handleRoomUpdate({ ...selectedRoom, power: !selectedRoom.power });
+              }}
+              onRoomUpdate={handleRoomUpdate}
+            />
+          )}
+        </div>
+        <div className="app__view">
+          <GlobalSettingsPanel
+            settings={globalSettings}
+            brightnessConfig={brightnessConfig}
+            isNight={isNight}
+            onThemeChange={(theme) => handleGlobalUpdate({ theme })}
+            onBrightnessChange={handleBrightnessUpdate}
+            onBack={() => setCurrentView('main')}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;

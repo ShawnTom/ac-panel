@@ -1,0 +1,238 @@
+.home-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px;
+  gap: 14px;
+}
+
+.home-panel--off {
+  opacity: 0.5;
+}
+
+/* ===== 顶部栏: 时间 + 一键开关 ===== */
+.home-panel__top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 64px;
+}
+
+/* 一键启动/关闭按钮 */
+.home-panel__master-power {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1.5px solid;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.home-panel__master-power--on {
+  border-color: var(--power-on);
+  color: var(--bg-secondary);
+  background: var(--power-on);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.home-panel__master-power--on:hover {
+  background: var(--power-on);
+  box-shadow: 0 0 18px var(--accent-glow);
+}
+
+.home-panel__master-power--on:active {
+  transform: scale(0.95);
+}
+
+.home-panel__master-power--off {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: var(--bg-glow-1);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.home-panel__master-power--off:hover {
+  background: var(--bg-card-hover);
+  box-shadow: 0 0 18px var(--accent-glow);
+}
+
+.home-panel__master-power--off:active {
+  transform: scale(0.95);
+}
+
+.home-panel__master-power-label {
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* 运行中图标旋转动画 */
+.home-panel__power-icon--spin {
+  animation: home-panel-spin 2s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes home-panel-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ===== 时间块（左侧）===== */
+.home-panel__time-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.home-panel__time {
+  font-size: 52px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-panel__date {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* ===== 室外环境 ===== */
+.home-panel__outdoor {
+  padding: 2px 0;
+}
+
+.home-panel__outdoor-text {
+  font-size: 13px;
+  color: var(--accent-primary);
+  letter-spacing: 0.3px;
+  line-height: 1.5;
+}
+
+/* ===== 设备名称 ===== */
+.home-panel__device {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.home-panel__location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent-primary);
+}
+
+.home-panel__location-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-panel__location-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-primary);
+}
+
+.home-panel__device-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.home-panel__device-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ===== 数据卡片 ===== */
+.home-panel__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.home-panel__card-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.home-panel__data-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.home-panel__data-card--wide {
+  flex-direction: row;
+  justify-content: space-around;
+  padding: 14px 12px;
+}
+
+.home-panel__data-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+}
+
+.home-panel__data-label {
+  font-size: 12px;
+  color: var(--accent-primary);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.home-panel__data-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 空气质量三列 */
+.home-panel__air-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.home-panel__air-label {
+  font-size: 12px;
+  color: var(--accent-primary);
+  font-weight: 500;
+}
+
+.home-panel__air-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.home-panel__air-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--border-color);
+  flex-shrink: 0;
+}

@@ -1,0 +1,52 @@
+/* ===== Base CSS Variables (tech-blue-purple as default) ===== */
+:root {
+  --panel-size: 420px;
+  --transition-theme: 0.35s ease;
+  --transition-panel: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Typography scale — 整体放大一档 */
+  --fs-display: 88px;
+  --fs-title: 26px;
+  --fs-body: 18px;
+  --fs-label: 16px;
+  --fs-caption: 13px;
+}
+
+/* ===== Tech Blue Purple Theme (default) ===== */
+[data-theme="tech-blue-purple"] {
+  --bg-primary: #07091a;
+  --bg-secondary: #0c0f24;
+  --bg-card: rgba(22, 26, 56, 0.55);
+  --bg-card-hover: rgba(32, 36, 76, 0.7);
+  --bg-glass: rgba(22, 26, 56, 0.45);
+  --bg-glow-1: rgba(108, 92, 231, 0.35);
+  --bg-glow-2: rgba(91, 156, 255, 0.25);
+  --text-primary: #ffffff;
+  --text-secondary: #b8bce0;
+  --text-muted: #6f749a;
+  --accent-primary: #6c5ce7;
+  --accent-secondary: #8b9eff;
+  --accent-tertiary: #5b9cff;
+  --accent-gradient: linear-gradient(135deg, #6c5ce7 0%, #8b9eff 50%, #5b9cff 100%);
+  --accent-gradient-cool: linear-gradient(135deg, #6c5ce7 0%, #5b9cff 100%);
+  --accent-glow: rgba(108, 92, 231, 0.55);
+  --border-color: rgba(139, 158, 255, 0.18);
+  --border-strong: rgba(139, 158, 255, 0.35);
+  --dial-track: rgba(139, 158, 255, 0.12);
+  --dial-progress: linear-gradient(90deg, #6c5ce7, #8b9eff);
+  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.55);
+  --color-cool: #74b9ff;
+  --color-heat: #ff7675;
+  --color-wind: #dfe6e9;
+  --color-auto: #55efc4;
+  --power-on: #55efc4;
+  --power-off: #636e72;
+
+  /* 模式激活态专属色：冷蓝 / 暖橙 / 中性灰青 */
+  --mode-cool-bg: linear-gradient(135deg, #5b9cff 0%, #74b9ff 100%);
+  --mode-cool-glow: rgba(91, 156, 255, 0.55);
+  --mode-heat-bg: linear-gradient(135deg, #ff7675 0%, #ffa502 100%);
+  --mode-heat-glow: rgba(255, 118, 117, 0.55);
+  --mode-wind-bg: linear-gradient(135deg, #81ecec 0%, #a29bfe 100%);
+  --mode-wind-glow: rgba(129, 236, 236, 0.45);
+}

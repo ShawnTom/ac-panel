@@ -1,0 +1,145 @@
+.room-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 12px;
+}
+
+.room-panel--off {
+  opacity: 0.5;
+}
+
+.room-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.room-panel__room-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.room-panel__room-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.room-panel__time {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.room-panel__back-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
+  color: var(--text-primary);
+}
+
+.room-panel__back-btn:hover {
+  background: var(--bg-card-hover);
+}
+
+.room-panel__back-btn:active {
+  transform: scale(0.92);
+}
+
+.room-panel__dial-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+}
+
+.room-panel__info-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.room-panel__info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.room-panel__info-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.room-panel__info-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.room-panel__info-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-color);
+}
+
+.room-panel__power-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--power-on);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  transition: all 0.2s ease;
+}
+
+.room-panel__power-btn:hover {
+  background: rgba(85, 239, 196, 0.1);
+}
+
+.room-panel__power-btn:active {
+  transform: scale(0.92);
+}
+
+.room-panel__power-btn--off {
+  border-color: var(--power-off);
+}
+
+.room-panel__power-icon {
+  font-size: 22px;
+  color: var(--power-on);
+}
+
+.room-panel__power-btn--off .room-panel__power-icon {
+  color: var(--power-off);
+}
+
+.room-panel__off-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
+
+.room-panel__off-time {
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--text-secondary);
+}

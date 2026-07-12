@@ -1,0 +1,468 @@
+.main-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 18px 22px;
+  gap: 12px;
+}
+
+.main-panel--off {
+  opacity: 1;
+}
+
+/* ===== Header ===== */
+.main-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4px;
+  flex-shrink: 0;
+  min-height: 42px;
+}
+
+/* 房间名 + 时间 横向并列：房间名在左，时间紧贴右侧 */
+.main-panel__room-info {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.main-panel__room-name {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.main-panel__time {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
+  opacity: 1;
+  flex-shrink: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* 关闭态：保留 header 时间显示，但淡化（避免和中央大时钟视觉打架） */
+.main-panel__time--dim {
+  opacity: 0.45;
+}
+
+.main-panel__settings-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease, transform 0.1s, box-shadow 0.3s ease;
+  color: var(--text-primary);
+  backdrop-filter: blur(8px);
+}
+
+.main-panel__settings-btn:hover {
+  background: var(--bg-card-hover);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.main-panel__settings-btn:active {
+  transform: scale(0.92);
+}
+
+/* ===== Center stage: dial ↔ off clock cross-fade ===== */
+.main-panel__stage {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  /* 整体 stage 向上偏，让 dial 距离 header 更近 */
+  margin-top: -20px;
+}
+
+.main-panel__dial-wrapper {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 6px;
+  /* 整个 dial 略向上偏，远离下方的信息卡 */
+  margin-top: -8px;
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+  transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.45s ease;
+  pointer-events: auto;
+}
+
+.main-panel__dial-wrapper--hidden {
+  opacity: 0;
+  transform: scale(0.92);
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+.main-panel__clock {
+  position: absolute;
+  inset: 0;
+  /* 时钟整体相对 stage 顶部下移一点，跟 dial 视觉中心对齐 */
+  padding-top: 36px;
+  /* 跟 dial 一起上移，保持关闭态和打开态视觉位置一致 */
+  margin-top: -8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  opacity: 0;
+  transform: scale(0.94);
+  filter: blur(8px);
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.5s ease;
+  pointer-events: none;
+}
+
+.main-panel__clock--visible {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+  pointer-events: none;
+}
+
+.main-panel__clock-time {
+  font-size: 88px;
+  font-weight: 200;
+  color: var(--text-primary);
+  letter-spacing: 2px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 30px var(--accent-glow);
+}
+
+.main-panel__clock-period {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--accent-secondary);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  margin-top: 4px;
+  text-shadow: 0 0 14px var(--accent-glow);
+}
+
+.main-panel__clock-hint {
+  margin-top: 22px;
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  opacity: 0.7;
+}
+
+/* ===== Info cards row: 当前温度 / 当前湿度 =====
+   位于 stage (调温控件) 和 control (开关) 之间
+   关闭时不渲染（依赖 tsx 里的 isPoweredOn 条件）
+*/
+.main-panel__info-row {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+  padding: 0 4px;
+  /* 在 stage 和 info-row 之间多留点呼吸空间，让温度数字与卡片不贴在一起 */
+  margin-top: 14px;
+  animation: main-panel__info-fade-in 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+@keyframes main-panel__info-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.main-panel__info-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  min-height: 52px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  transition: background 0.3s ease, border-color 0.3s ease,
+    transform 0.1s ease;
+}
+
+.main-panel__info-card:active {
+  transform: scale(0.98);
+}
+
+.main-panel__info-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--bg-glow-1);
+  color: var(--accent-secondary);
+}
+
+.main-panel__info-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.main-panel__info-label {
+  font-size: var(--fs-caption);
+  color: var(--text-secondary);
+  letter-spacing: 0.4px;
+  line-height: 1.2;
+}
+
+.main-panel__info-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
+}
+
+/* ===== Bottom unified control: collapses & centers when off =====
+   关键：外层固定宽 + 用 transform: scaleX 做收缩 (GPU 合成层)，不再过渡 width/gap/padding
+*/
+.main-panel__control {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  padding: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 999px; /* 始终胶囊形 */
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+  width: 100%;
+  margin: 0 auto;
+  /* 只过渡可合成属性 + 颜色 + 阴影；layout 走父容器缩放 */
+  transform: scaleX(1);
+  transform-origin: center center;
+  transition: transform 0.4s cubic-bezier(0.34, 1.2, 0.64, 1),
+    background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  will-change: transform;
+}
+
+.main-panel__control--on {
+  border-color: var(--border-strong);
+  box-shadow: 0 0 28px var(--accent-glow);
+}
+
+/* 关闭态：scaleX 收缩 + 居中。width/padding/gap 不再过渡，避免 layout thrash */
+.main-panel__control--off {
+  width: fit-content;
+  transform: scaleX(1); /* 由 inner content 决定实际尺寸，不再做 scaleX 缩放 */
+  border-color: var(--border-color);
+  box-shadow: none;
+}
+
+/* Power pill — 始终胶囊形 (radius = height/2) */
+.main-panel__power-pill {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  min-width: 96px;
+  height: 52px;
+  border-radius: 999px; /* 胶囊：高度一半 */
+  border: 1.5px solid var(--power-on);
+  background: var(--bg-glow-1);
+  color: var(--power-on);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--fs-body);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: background 0.4s ease, box-shadow 0.4s ease,
+    transform 0.1s ease, border-color 0.4s ease, color 0.4s ease;
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
+.main-panel__power-pill:hover {
+  background: var(--bg-card-hover);
+  box-shadow: 0 0 22px var(--accent-glow);
+}
+
+.main-panel__power-pill:active {
+  transform: scale(0.96);
+}
+
+.main-panel__power-pill-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+.main-panel__power-pill-label {
+  line-height: 1;
+  /* 只用 opacity，不动 layout，文字始终保持可见 */
+  transition: opacity 0.4s ease;
+  opacity: 1;
+}
+
+/* Off state — pill turns muted grey */
+.main-panel__control--off .main-panel__power-pill {
+  border-color: var(--power-off);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  box-shadow: none;
+}
+
+.main-panel__control--off .main-panel__power-pill:hover {
+  background: var(--bg-card-hover);
+  box-shadow: 0 0 18px var(--accent-glow);
+  color: var(--text-primary);
+}
+
+/* 关闭态：label 只淡化但保持可见（不消失） */
+.main-panel__control--off .main-panel__power-pill-label {
+  opacity: 0.7;
+}
+
+.main-panel__control--off .main-panel__power-pill-icon {
+  transform: scale(1.05);
+}
+
+/* Mode cluster — 开态常驻；关态直接 display:none 卸载，不参与 layout */
+.main-panel__mode-cluster {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  min-width: 0;
+  opacity: 1;
+  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.main-panel__mode-cluster--hidden {
+  display: none;
+}
+
+/* Mode chip — 胶囊 */
+.main-panel__mode-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 52px;
+  padding: 0 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease,
+    border-color 0.3s ease, transform 0.1s ease;
+}
+
+.main-panel__mode-chip:hover {
+  background: var(--bg-glow-1);
+  color: var(--text-primary);
+}
+
+.main-panel__mode-chip:active {
+  transform: scale(0.96);
+}
+
+/* 模式激活态：默认走主题主色 gradient */
+.main-panel__mode-chip--active {
+  background: var(--accent-gradient-cool);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.main-panel__mode-chip--active:hover {
+  background: var(--accent-gradient-cool);
+  color: #ffffff;
+}
+
+/* 按模式区分冷暖色 — 优先使用主题里定义的 --mode-{mode}-{from,to,glow}，
+   缺省 fallback 到主题主色，保证零配置也能用 */
+.main-panel__mode-chip--active[data-mode="cool"] {
+  background: var(--mode-cool-bg, var(--accent-gradient-cool));
+  box-shadow: 0 4px 16px var(--mode-cool-glow, var(--accent-glow));
+}
+.main-panel__mode-chip--active[data-mode="cool"]:hover {
+  background: var(--mode-cool-bg, var(--accent-gradient-cool));
+}
+
+.main-panel__mode-chip--active[data-mode="heat"] {
+  background: var(--mode-heat-bg, var(--accent-gradient-cool));
+  box-shadow: 0 4px 16px var(--mode-heat-glow, var(--accent-glow));
+}
+.main-panel__mode-chip--active[data-mode="heat"]:hover {
+  background: var(--mode-heat-bg, var(--accent-gradient-cool));
+}
+
+.main-panel__mode-chip--active[data-mode="wind"] {
+  background: var(--mode-wind-bg, var(--accent-gradient-cool));
+  box-shadow: 0 4px 16px var(--mode-wind-glow, var(--accent-glow));
+}
+.main-panel__mode-chip--active[data-mode="wind"]:hover {
+  background: var(--mode-wind-bg, var(--accent-gradient-cool));
+}
+
+.main-panel__mode-chip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-panel__mode-chip-label {
+  line-height: 1;
+}
+
+/* Readonly 模式按钮 — 仅展示，可点击但弹出 toast */
+.main-panel__mode-chip--readonly {
+  cursor: pointer;
+  opacity: 0.5;
+}
+
+.main-panel__mode-chip--readonly:hover {
+  background: var(--bg-glow-1);
+  color: var(--text-primary);
+}

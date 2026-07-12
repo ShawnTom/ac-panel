@@ -1,0 +1,32 @@
+/* room-panel 同时挂 main-panel 类，header / control / dial 全部复用 main-panel__ 系列样式 */
+
+.room-panel {
+  /* 房间面板不显示"轻触开关开启"那行 hint（每个房间有自己的开关） */
+  padding-top: 20px;
+  padding-bottom: 22px;
+}
+
+.room-panel__back-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease, transform 0.1s, box-shadow 0.3s ease;
+  color: var(--text-primary);
+  backdrop-filter: blur(8px);
+  flex-shrink: 0;
+}
+
+.room-panel__back-btn:hover {
+  background: var(--bg-card-hover);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.room-panel__back-btn:active {
+  transform: scale(0.92);
+}

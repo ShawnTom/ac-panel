@@ -1,0 +1,69 @@
+.temperature-dial {
+  position: relative;
+  width: 320px;
+  height: 200px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  cursor: grab;
+  touch-action: none;
+}
+
+.temperature-dial:active {
+  cursor: grabbing;
+}
+
+.temperature-dial--disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.temperature-dial__svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 20px var(--accent-glow));
+}
+
+.temperature-dial__knob {
+  filter: drop-shadow(0 0 12px var(--accent-glow));
+  transition: r 0.15s ease;
+}
+
+/* Center display — number + unit inline, horizontally centered,
+   vertical position matches the bottom of the half-circle arc */
+.temperature-dial__center {
+  position: absolute;
+  /* SVG 半圆底端在 viewBox 87.5% 处（175/200），用百分比定位让数字底端与之对齐 */
+  bottom: 4%;
+  left: 50%;
+  /* 数字基础上移 24px（与半圆底端脱开一些） */
+  transform: translate(-50%, -24px);
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.temperature-dial__value {
+  font-size: var(--fs-display);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 0.95;
+  letter-spacing: -2px;
+  text-shadow: 0 0 20px var(--accent-glow);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Unit sits to the right of the number, baseline-aligned with the number's bottom */
+.temperature-dial__unit {
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-left: 6px;
+  letter-spacing: 0.5px;
+  align-self: flex-end;
+  line-height: 1;
+  transform: translateY(-6px);
+}

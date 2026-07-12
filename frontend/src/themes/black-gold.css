@@ -1,0 +1,67 @@
+/* ===== Black Gold Theme — 尊贵黑金 (v2 重制版) =====
+   设计原则 (来自卡地亚 / 百达翡丽 / 劳斯莱斯 / Bentley / Apple Watch Edition)：
+   1. 金为点，黑为面 — 黑色占 90%+，金色只在焦点元素上点缀（≤5%）
+   2. 真黑不用棕 — 纯 #0a0a0a 基底，避免任何暖色
+   3. 18K 金色调 — 主色 #D4AF37 (classic gold) + #C9A961 (champagne) + #8B7332 (暗金)
+   4. 烫金文字效果 — 极细描边/字 + text-shadow 微光
+   5. 阴影极深 — 让金色 UI 元素"浮"在黑幕之上
+*/
+[data-theme="black-gold"] {
+  /* 背景层：真黑，绝不带暖色 */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #0f0f0f;
+  /* 卡片底：比背景略亮的黑灰，让卡片"浮"起来 */
+  --bg-card: rgba(28, 28, 28, 0.7);
+  --bg-card-hover: rgba(40, 40, 40, 0.8);
+  --bg-glass: rgba(20, 20, 20, 0.6);
+  /* 光晕：金色只作为非常弱的"余晖"，不再当主光源 */
+  --bg-glow-1: rgba(212, 175, 55, 0.08);
+  --bg-glow-2: rgba(201, 169, 97, 0.04);
+
+  /* 文字：高对比白 + 中性灰，金色仅用于极关键的强调 */
+  --text-primary: #f5f5f5;
+  --text-secondary: #a0a0a0;
+  --text-muted: #5a5a5a;
+
+  /* 主色：18K 金色三档（暗→中→亮），用于极克制的点缀 */
+  --accent-primary: #D4AF37;     /* classic gold — 用于按钮、激活态 */
+  --accent-secondary: #C9A961;   /* champagne — 用于图标、辅助色 */
+  --accent-tertiary: #8B7332;    /* dark gold — 用于边框、描边 */
+  /* 渐变：从暗金到亮金的细腻过渡，模拟金属反光 */
+  --accent-gradient: linear-gradient(135deg, #8B7332 0%, #D4AF37 50%, #C9A961 100%);
+  --accent-gradient-cool: linear-gradient(135deg, #C9A961 0%, #D4AF37 100%);
+  --accent-glow: rgba(212, 175, 55, 0.35);
+
+  /* 边框：暗金描边，几乎不抢眼 */
+  --border-color: rgba(139, 115, 50, 0.25);
+  --border-strong: rgba(212, 175, 55, 0.5);
+
+  /* 仪表盘轨道：极暗金，几乎与背景融合 */
+  --dial-track: rgba(139, 115, 50, 0.15);
+  --dial-progress: linear-gradient(90deg, #8B7332, #D4AF37, #C9A961);
+
+  /* 阴影：极深黑 + 极弱金色余晖 */
+  --shadow-card: 0 24px 70px rgba(0, 0, 0, 0.85),
+                 0 0 1px rgba(212, 175, 55, 0.04);
+
+  /* 模式色：克制的"金 + 行业惯例色" */
+  --color-cool: #6FA8DC;         /* 制冷：偏冷的金蓝色 */
+  --color-heat: #E89B8A;         /* 制热：玫瑰金（跟金调一致） */
+  --color-wind: #C9A961;         /* 通风：champagne 金 */
+  --color-auto: #88C9A1;         /* 自动：低饱和的玉色（避免绿松石太鲜艳） */
+
+  /* 电源指示：金色边框（开机态）+ 暗金灰（关闭态） */
+  --power-on: #D4AF37;
+  --power-off: #4a4a4a;
+
+  /* 模式激活态专属色：
+     cool 用蓝灰保持"冷"语义但不破坏金色调性
+     heat 用玫瑰金→橙红，跟黑金主题天然贴合
+     wind 用香槟金渐变，跟金色基调统一 */
+  --mode-cool-bg: linear-gradient(135deg, #6FA8DC 0%, #4a6fa5 100%);
+  --mode-cool-glow: rgba(111, 168, 220, 0.5);
+  --mode-heat-bg: linear-gradient(135deg, #E89B8A 0%, #d04a3a 100%);
+  --mode-heat-glow: rgba(232, 155, 138, 0.55);
+  --mode-wind-bg: linear-gradient(135deg, #8B7332 0%, #D4AF37 50%, #C9A961 100%);
+  --mode-wind-glow: rgba(212, 175, 55, 0.55);
+}

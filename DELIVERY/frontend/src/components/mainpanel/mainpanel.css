@@ -1,0 +1,187 @@
+.main-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 12px;
+}
+
+.main-panel--off {
+  opacity: 0.5;
+}
+
+.main-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.main-panel__room-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.main-panel__room-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.main-panel__time {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.main-panel__settings-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
+  color: var(--text-primary);
+}
+
+.main-panel__settings-btn:hover {
+  background: var(--bg-card-hover);
+}
+
+.main-panel__settings-btn:active {
+  transform: scale(0.92);
+}
+
+.main-panel__modes {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.main-panel__mode-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 60px;
+}
+
+.main-panel__mode-btn--active {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.main-panel__mode-btn--active .main-panel__mode-label,
+.main-panel__mode-btn--active .main-panel__mode-icon {
+  color: #fff;
+}
+
+.main-panel__mode-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.main-panel__mode-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.main-panel__dial-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+}
+
+.main-panel__info-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.main-panel__info-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.main-panel__info-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.main-panel__info-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.main-panel__info-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-color);
+}
+
+.main-panel__power-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--power-on);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  transition: all 0.2s ease;
+}
+
+.main-panel__power-btn:hover {
+  background: rgba(85, 239, 196, 0.1);
+}
+
+.main-panel__power-btn:active {
+  transform: scale(0.92);
+}
+
+.main-panel__power-btn--off {
+  border-color: var(--power-off);
+}
+
+.main-panel__power-icon {
+  font-size: 22px;
+  color: var(--power-on);
+}
+
+.main-panel__power-btn--off .main-panel__power-icon {
+  color: var(--power-off);
+}
+
+.main-panel__off-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
+
+.main-panel__off-time {
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--text-secondary);
+}

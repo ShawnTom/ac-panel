@@ -1,0 +1,181 @@
+.room-list {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 16px 22px;
+  gap: 14px;
+}
+
+.room-list__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
+.room-list__back-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  color: var(--text-primary);
+  backdrop-filter: blur(8px);
+  flex-shrink: 0;
+}
+
+.room-list__back-btn:hover {
+  background: var(--bg-card-hover);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.room-list__back-btn:active {
+  transform: scale(0.92);
+}
+
+.room-list__title {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+/* 两列网格布局 */
+.room-list__grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-content: start;
+}
+
+.room-list__card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  backdrop-filter: blur(10px);
+  transition: background 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.room-list__card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.room-list__card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-strong);
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.room-list__card:active {
+  transform: scale(0.98);
+}
+
+.room-list__card--on {
+  border-color: var(--border-strong);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.room-list__card--off {
+  opacity: 0.55;
+}
+
+.room-list__card-temp {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.room-list__card-temp-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.room-list__card-temp-unit {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.room-list__card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.room-list__card-name {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+
+/* 圆形电源开关按钮 — 卡片右侧垂直居中 */
+.room-list__power-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  align-self: center;
+}
+
+.room-list__power-btn--on {
+  border-color: var(--power-on);
+  color: var(--power-on);
+  background: var(--bg-glow-1);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.room-list__power-btn--on:hover {
+  background: var(--bg-card-hover);
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
+.room-list__power-btn--on:active {
+  transform: scale(0.9);
+}
+
+.room-list__power-btn--off {
+  border-color: var(--power-off);
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.room-list__power-btn--off:hover {
+  background: var(--bg-glow-1);
+  color: var(--text-secondary);
+}
+
+.room-list__power-btn--off:active {
+  transform: scale(0.9);
+}
