@@ -150,7 +150,7 @@
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 999px;
-  margin: 0 auto;
+  margin: -8px auto 0;                 /* 往上挪：负 margin-top 抵消 main-panel gap(12) 中的一部分 */
   width: fit-content;
 }
 

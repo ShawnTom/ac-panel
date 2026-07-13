@@ -63,19 +63,6 @@
   font-weight: 600;
 }
 
-.fan-speed__label {
-  font-size: 11px;
-  color: var(--text-muted);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  /* label 单独成行：position absolute 在 display 上方，避免挤占 row 空间 */
-  position: absolute;
-  top: -18px;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-}
-
 /* ===== 风扇 icon ===== */
 .fan-icon {
   width: 64px;
@@ -159,14 +146,16 @@
   flex: 1;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 5px;
-  height: 72px;                       /* 整体加高：56 → 72 */
+  gap: 4px;
+  height: auto;                        /* 高度随内容自适应，让 64×12 bar 决定 */
+  min-height: 64px;                    /* 容纳 64 宽 bar + 数字 */
   padding: 6px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   cursor: pointer;
   align-items: center;                /* segment 内部上下居中 */
+  justify-items: center;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -196,7 +185,7 @@
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.5px;
-  height: 100%;
+  width: 64px;                         /* 段固定 64px 宽，配合下方 64×12 bar */
   transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease;
 }
 
@@ -209,14 +198,14 @@
   transform: scale(0.94);
 }
 
-/* 段下方的"条"：表示能量柱（加粗） */
+/* 段下方的"条"：表示能量柱（固定 64×12） */
 .fan-speed__segment-bar {
   display: block;
-  width: 100%;
-  height: 14px;                       /* 能量柱加粗：6 → 14 */
+  width: 64px;                         /* 固定宽 64px */
+  height: 12px;                        /* 固定高 12px */
   border-radius: 999px;
   background: var(--dial-track);
-  transition: background 0.25s ease, box-shadow 0.25s ease, height 0.2s ease;
+  transition: background 0.25s ease, box-shadow 0.25s ease, width 0.2s ease, height 0.2s ease;
 }
 
 .fan-speed__segment-num {

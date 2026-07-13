@@ -103,9 +103,6 @@ export function FanSpeedControl({
           <span className="fan-speed__value">{safe}</span>
           <span className="fan-speed__unit">档</span>
         </div>
-        <div className="fan-speed__label">
-          {isInactive ? (autoMode ? '自动风量' : '已关闭') : '风量'}
-        </div>
       </div>
 
       {/* 中部：± 按钮 + 5 段 segment */}
