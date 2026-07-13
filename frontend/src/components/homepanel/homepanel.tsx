@@ -120,12 +120,12 @@ export function HomePanel({ rooms, settings, onPowerToggle }: HomePanelProps) {
 
       <div className="home-panel__cards">
         <div className="home-panel__card-row">
-          <div className="home-panel__data-card">
+          <div className="home-panel__data-card home-panel__data-card--inline">
             <span className="home-panel__data-icon"><TempIcon /></span>
             <span className="home-panel__data-label">平均温度</span>
             <span className="home-panel__data-value">{avgTemp}°C</span>
           </div>
-          <div className="home-panel__data-card">
+          <div className="home-panel__data-card home-panel__data-card--inline">
             <span className="home-panel__data-icon"><HumidityIcon /></span>
             <span className="home-panel__data-label">平均湿度</span>
             <span className="home-panel__data-value">{avgHumidity}%</span>

@@ -1,7 +1,8 @@
 import { useState, useEffect, type ReactElement } from 'react';
-import type { Room, GlobalSettings, ACMode } from '../../types';
+import type { Room, GlobalSettings, ACMode, FanMode } from '../../types';
 import { Panel } from '../shared/panel';
 import { TemperatureDial } from '../temperaturedial/temperaturedial';
+import { FanSpeedControl } from '../fanspeedcontrol/fanspeedcontrol';
 import { useToast } from '../../hooks/usetoast';
 import '../../hooks/toast.css';
 import '../mainpanel/mainpanel.css';
@@ -110,8 +111,21 @@ export function RoomPanel({
   const activeMode: ModeKey =
     settings.currentMode === 'auto' ? 'cool' : (settings.currentMode as ModeKey);
 
+  // 通风模式：主区显示风量控件（替代温度旋钮）；其他模式保持温度旋钮
+  const isVentMode = activeMode === 'wind' && room.fanAdjustable !== false;
+  const fanSpeed = room.fanSpeed ?? 1;
+  const fanMode: FanMode = room.fanMode ?? 'manual';
+
+  const handleFanSpeedChange = (next: number) => {
+    onRoomUpdate({ ...room, fanSpeed: next });
+  };
+
+  const handleFanModeChange = (m: FanMode) => {
+    onRoomUpdate({ ...room, fanMode: m });
+  };
+
   return (
-    <Panel className={`room-panel main-panel ${!isPoweredOn ? 'main-panel--off' : ''}`}>
+    <Panel className={`room-panel main-panel ${!isPoweredOn ? 'main-panel--off' : ''} ${isPoweredOn && isVentMode ? 'main-panel--vent' : ''}`}>
       {/* Toast 提示 */}
       <div className={`toast ${toast.visible ? 'toast--visible' : ''}`}>
         {toast.message}
@@ -132,9 +146,23 @@ export function RoomPanel({
 
       {/* Center stage */}
       <div className="main-panel__stage">
+        {/* 通风模式：风量控件 */}
         <div
-          className={`main-panel__dial-wrapper ${!isPoweredOn ? 'main-panel__dial-wrapper--hidden' : ''}`}
-          aria-hidden={!isPoweredOn}
+          className={`main-panel__fan-stage ${(isPoweredOn && isVentMode) ? '' : 'main-panel__fan-stage--hidden'}`}
+          aria-hidden={!(isPoweredOn && isVentMode)}
+        >
+          <FanSpeedControl
+            value={fanSpeed}
+            onChange={handleFanSpeedChange}
+            autoMode={fanMode === 'auto'}
+            disabled={!isPoweredOn}
+          />
+        </div>
+
+        {/* 制冷/制热：温度旋钮 */}
+        <div
+          className={`main-panel__dial-wrapper ${(isPoweredOn && !isVentMode) ? '' : 'main-panel__dial-wrapper--hidden'}`}
+          aria-hidden={!(isPoweredOn && !isVentMode)}
         >
           <TemperatureDial
             value={room.acTemp}
@@ -154,6 +182,26 @@ export function RoomPanel({
           <span className="main-panel__clock-hint">轻触开关开启空调</span>
         </div>
       </div>
+
+      {/* 通风模式：自动/手动 切换 — 紧贴 stage 下方 */}
+      {isPoweredOn && isVentMode && (
+        <div className="main-panel__mode-toggle-row">
+          <button
+            className={`main-panel__mode-toggle ${fanMode === 'auto' ? 'is-active' : ''}`}
+            onClick={() => handleFanModeChange('auto')}
+            aria-pressed={fanMode === 'auto'}
+          >
+            自动
+          </button>
+          <button
+            className={`main-panel__mode-toggle ${fanMode === 'manual' ? 'is-active' : ''}`}
+            onClick={() => handleFanModeChange('manual')}
+            aria-pressed={fanMode === 'manual'}
+          >
+            手动
+          </button>
+        </div>
+      )}
 
       {/* 当前温度 / 当前湿度 信息卡 */}
       {isPoweredOn && (

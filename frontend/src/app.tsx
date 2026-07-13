@@ -33,7 +33,15 @@ function App() {
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
 
   const { setTheme } = useTheme(globalSettings.theme);
-  const { brightnessConfig, updateConfig, isNight } = useBrightness(globalSettings.brightness);
+  const {
+    brightnessConfig,
+    updateConfig,
+    isNight,
+    previewBrightness,
+    cancelPreview,
+    previewCountdown,
+    previewValue,
+  } = useBrightness(globalSettings.brightness);
 
   // 主题切换
   useEffect(() => {
@@ -89,6 +97,18 @@ function App() {
 
   const handleModeChange = (mode: ACMode) => {
     handleGlobalUpdate({ currentMode: mode });
+    // 通风模式：同步所有房间切换到通风，并确保它们有风量档/模式/可调
+    if (mode === 'wind') {
+      setRooms(prev =>
+        prev.map(r => ({
+          ...r,
+          // 进入通风时把每个房间都设成可调 + 默认手动/3档（如果之前没有）
+          fanAdjustable: true,
+          fanSpeed: r.fanSpeed ?? 3,
+          fanMode: r.fanMode ?? 'manual',
+        }))
+      );
+    }
   };
 
   const selectedRoom = rooms.find(r => r.id === selectedRoomId) || null;
@@ -153,6 +173,9 @@ function App() {
             isNight={isNight}
             onThemeChange={(theme) => handleGlobalUpdate({ theme })}
             onBrightnessChange={handleBrightnessUpdate}
+            onBrightnessPreview={previewBrightness}
+            previewValue={previewValue}
+            previewCountdown={previewCountdown}
             onBack={() => setCurrentView('main')}
           />
         </div>

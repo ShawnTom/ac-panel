@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface BrightnessConfig {
   day: number;
@@ -13,23 +13,31 @@ interface BrightnessConfig {
  * - 夜间模式最低不低于 30%，避免 brightness(0) 全黑
  * - 白天模式最低不低于 50%，保证普通环境可读
  * - 用 filter: brightness 而非 opacity，避免白底/黑底同时变暗的问题
+ *
+ * 跨时段调节：
+ * - 白天调夜间/夜间调白天滑块时，临时应用 3 秒预览
+ * - 预览期间通过 previewValue 暴露给上层做 toast 倒计时
+ * - 3 秒后自动恢复当前时段配置的亮度
  */
 const MIN_DAY = 50;
 const MIN_NIGHT = 30;
 const MAX_BRIGHTNESS = 100;
+const PREVIEW_DURATION_MS = 3000;
 
-/** 把用户配置钳到合理范围 */
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
 export function useBrightness(config: BrightnessConfig) {
   const [isNight, setIsNight] = useState(false);
-  // 初始化时就把不合法的旧值修正，避免从 localStorage 恢复后变全黑
   const [brightnessConfig, setBrightnessConfig] = useState<BrightnessConfig>({
     day: clamp(config.day, MIN_DAY, MAX_BRIGHTNESS),
     night: clamp(config.night, MIN_NIGHT, MAX_BRIGHTNESS),
   });
+  // 预览值：非 null 时说明正在预览中（用于上层 toast 倒计时）
+  const [previewValue, setPreviewValue] = useState<number | null>(null);
+  const previewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [countdown, setCountdown] = useState(0);
 
   useEffect(() => {
     const checkTime = () => {
@@ -41,22 +49,65 @@ export function useBrightness(config: BrightnessConfig) {
     return () => clearInterval(interval);
   }, []);
 
-  const applyBrightness = useCallback(() => {
-    const value = isNight ? brightnessConfig.night : brightnessConfig.day;
-    const root = document.getElementById('root');
-    if (root) {
-      // brightness(N/100) 的可读下限大约在 0.3-0.4，再低深色主题几乎看不见
-      // 所以即便用户拉到最低（30%），我们也用 0.55 的最低映射
-      const raw = value / 100;
-      const safe = Math.max(raw, 0.55); // 最低映射到 55%，保证可读
-      root.style.filter = `brightness(${safe.toFixed(2)})`;
-      root.style.transition = 'filter 0.5s ease';
+  // 取消预览：清除 timer + 重置状态
+  const cancelPreview = useCallback(() => {
+    if (previewTimerRef.current) {
+      clearTimeout(previewTimerRef.current);
+      previewTimerRef.current = null;
     }
-  }, [isNight, brightnessConfig]);
+    setPreviewValue(null);
+    setCountdown(0);
+  }, []);
 
+  // 把用户给定的值钳到合理范围并按最低映射
+  const applyValue = useCallback((value: number) => {
+    const root = document.getElementById('root');
+    if (!root) return;
+    const raw = value / 100;
+    const safe = Math.max(raw, 0.55);
+    root.style.filter = `brightness(${safe.toFixed(2)})`;
+    root.style.transition = 'filter 0.5s ease';
+  }, []);
+
+  // 应用当前时段配置的亮度（非预览）
+  const applyCurrent = useCallback(() => {
+    const value = isNight ? brightnessConfig.night : brightnessConfig.day;
+    applyValue(value);
+  }, [isNight, brightnessConfig, applyValue]);
+
+  // 当 isNight 或 brightnessConfig 变化时，如果不是预览态就应用
   useEffect(() => {
-    applyBrightness();
-  }, [applyBrightness]);
+    if (previewValue === null) {
+      applyCurrent();
+    }
+  }, [applyCurrent, previewValue]);
+
+  // 预览一个亮度值（跨时段滑块调节时调用）
+  const previewBrightness = useCallback((value: number) => {
+    cancelPreview();
+    setPreviewValue(value);
+    setCountdown(Math.ceil(PREVIEW_DURATION_MS / 1000));
+    applyValue(value);
+    previewTimerRef.current = setTimeout(() => {
+      cancelPreview();
+    }, PREVIEW_DURATION_MS);
+  }, [cancelPreview, applyValue]);
+
+  // 倒计时 tick：每秒递减
+  useEffect(() => {
+    if (previewValue === null) return;
+    const tick = setInterval(() => {
+      setCountdown(prev => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(tick);
+  }, [previewValue]);
+
+  // 卸载时清理
+  useEffect(() => {
+    return () => {
+      if (previewTimerRef.current) clearTimeout(previewTimerRef.current);
+    };
+  }, []);
 
   const updateConfig = useCallback((newConfig: Partial<BrightnessConfig>) => {
     setBrightnessConfig(prev => {
@@ -74,5 +125,9 @@ export function useBrightness(config: BrightnessConfig) {
     updateConfig,
     currentBrightness: isNight ? brightnessConfig.night : brightnessConfig.day,
     limits: { minDay: MIN_DAY, minNight: MIN_NIGHT, max: MAX_BRIGHTNESS },
+    previewValue,
+    previewCountdown: countdown,
+    previewBrightness,
+    cancelPreview,
   };
 }

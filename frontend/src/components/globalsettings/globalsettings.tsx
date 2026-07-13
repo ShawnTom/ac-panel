@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import type { GlobalSettings, ThemeName } from '../../types';
 import { Panel } from '../shared/panel';
+import '../../hooks/toast.css';
 import './globalsettings.css';
 
 interface GlobalSettingsProps {
@@ -8,6 +10,12 @@ interface GlobalSettingsProps {
   isNight: boolean;
   onThemeChange: (theme: ThemeName) => void;
   onBrightnessChange: (day: number, night: number) => void;
+  /** 跨时段调节时调用：临时应用 value 3 秒后自动恢复 */
+  onBrightnessPreview?: (value: number) => void;
+  /** 当前是否处于预览中（用于高亮提示） */
+  previewValue?: number | null;
+  /** 预览倒计时（秒） */
+  previewCountdown?: number;
   onBack: () => void;
 }
 
@@ -32,8 +40,49 @@ export function GlobalSettingsPanel({
   isNight,
   onThemeChange,
   onBrightnessChange,
+  onBrightnessPreview,
+  previewValue = null,
+  previewCountdown = 0,
   onBack,
 }: GlobalSettingsProps) {
+  // 全局 toast（用于跨时段预览倒计时）
+  const [globalToast, setGlobalToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
+
+  useEffect(() => {
+    if (previewValue === null) {
+      setGlobalToast({ message: '', visible: false });
+      return;
+    }
+    setGlobalToast({
+      message: `${previewCountdown}秒后退出预览`,
+      visible: true,
+    });
+  }, [previewValue, previewCountdown]);
+
+  /**
+   * 处理亮度滑块变化：
+   * - 当前时段滑块：直接写入配置
+   * - 跨时段滑块（白天调夜间/夜间调白天）：触发 3 秒预览 + toast 倒计时
+   */
+  const handleDayChange = (value: number) => {
+    if (isNight) {
+      // 当前是夜间，调节白天滑块 = 跨时段预览
+      onBrightnessPreview?.(value);
+    } else {
+      onBrightnessChange(value, brightnessConfig.night);
+    }
+  };
+
+  const handleNightChange = (value: number) => {
+    if (isNight) {
+      // 当前是夜间，调节夜间滑块 = 当前时段，直接写入
+      onBrightnessChange(brightnessConfig.day, value);
+    } else {
+      // 当前是白天，调节夜间滑块 = 跨时段预览
+      onBrightnessPreview?.(value);
+    }
+  };
+
   return (
     <Panel className="global-settings">
       {/* Header */}
@@ -42,6 +91,11 @@ export function GlobalSettingsPanel({
           <BackArrowIcon />
         </button>
         <span className="global-settings__title">设置</span>
+      </div>
+
+      {/* 跨时段预览 Toast */}
+      <div className={`toast ${globalToast.visible ? 'toast--visible' : ''}`}>
+        {globalToast.message}
       </div>
 
       {/* Theme Selection */}
@@ -68,7 +122,11 @@ export function GlobalSettingsPanel({
       <div className="global-settings__section">
         <div className="global-settings__section-header">
           <span className="global-settings__section-title">亮度</span>
-          <p className="global-settings__section-hint">最低亮度已限制，保证可读性</p>
+          <p className="global-settings__section-hint">
+            {isNight
+              ? '调节白天亮度将预览 3 秒后自动恢复夜间亮度'
+              : '调节夜间亮度将预览 3 秒后自动恢复白天亮度'}
+          </p>
         </div>
         <div className="global-settings__brightness">
           <div className="global-settings__brightness-row">
@@ -80,7 +138,7 @@ export function GlobalSettingsPanel({
               min={50}
               max={100}
               value={brightnessConfig.day}
-              onChange={(e) => onBrightnessChange(Number(e.target.value), brightnessConfig.night)}
+              onChange={(e) => handleDayChange(Number(e.target.value))}
               className="global-settings__slider"
             />
             <span className="global-settings__brightness-value">{brightnessConfig.day}%</span>
@@ -94,7 +152,7 @@ export function GlobalSettingsPanel({
               min={30}
               max={80}
               value={brightnessConfig.night}
-              onChange={(e) => onBrightnessChange(brightnessConfig.day, Number(e.target.value))}
+              onChange={(e) => handleNightChange(Number(e.target.value))}
               className="global-settings__slider"
             />
             <span className="global-settings__brightness-value">{brightnessConfig.night}%</span>
