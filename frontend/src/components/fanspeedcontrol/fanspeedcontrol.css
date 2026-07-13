@@ -198,11 +198,11 @@
   transform: scale(0.94);
 }
 
-/* 段内的"竖条"：表示能量柱（固定 12 宽 × 64 高，竖向） */
+/* 段内的"竖条"：表示能量柱（固定 16 宽 × 54 高，竖向，更胖） */
 .fan-speed__segment-bar {
   display: block;
-  width: 12px;                         /* 固定宽 12px */
-  height: 64px;                        /* 固定高 64px */
+  width: 16px;                         /* 固定宽 16px */
+  height: 54px;                        /* 固定高 54px */
   border-radius: 999px;
   background: var(--dial-track);
   transition: background 0.25s ease, box-shadow 0.25s ease, width 0.2s ease, height 0.2s ease;

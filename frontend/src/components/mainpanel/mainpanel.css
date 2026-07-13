@@ -150,10 +150,8 @@
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 999px;
-  margin: -16px auto 0;                /* 往上挪：抵消 main-panel gap(12) 并继续向上覆盖到风量条附近 */
+  margin: 8px auto 0;                  /* 配合 main-panel gap(12) 让 stage 底 → chip 顶 = 20px */
   width: fit-content;
-  position: relative;                  /* 撑在 fan-stage 内容之上 */
-  z-index: 1;
 }
 
 .main-panel__mode-toggle {
