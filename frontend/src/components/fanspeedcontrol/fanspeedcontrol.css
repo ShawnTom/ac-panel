@@ -4,8 +4,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
-  padding: 12px 14px 18px;
+  gap: 16px;
+  padding: 4px 14px 18px;            /* 顶 padding 收小 + 整体上移 */
+  margin-top: -14px;                  /* 整体相对 stage 向上抬一点 */
   user-select: none;
   touch-action: none;
 }
@@ -21,28 +22,32 @@
   pointer-events: none;
 }
 
-/* ===== 顶部 display：fan icon + 大数字 ===== */
+/* ===== 顶部 display：fan icon + 大数字 同一行，水平居中 ===== */
 .fan-speed__display {
+  position: relative;                 /* label 绝对定位的锚点 */
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 4px;
-  margin-top: 4px;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 2px;
+  padding-top: 14px;                 /* 给绝对定位的 label 留出顶部空间 */
 }
 
 .fan-speed__readout {
   display: flex;
   align-items: baseline;
-  gap: 4px;
+  gap: 6px;
   line-height: 1;
 }
 
 .fan-speed__value {
-  font-size: 64px;
+  font-size: 56px;
   font-weight: 700;
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
   letter-spacing: -1px;
+  line-height: 1;
   text-shadow: 0 0 18px var(--accent-glow);
   transition: text-shadow 0.3s ease;
 }
@@ -63,7 +68,12 @@
   color: var(--text-muted);
   letter-spacing: 3px;
   text-transform: uppercase;
-  margin-top: 2px;
+  /* label 单独成行：position absolute 在 display 上方，避免挤占 row 空间 */
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
 }
 
 /* ===== 风扇 icon ===== */
@@ -75,6 +85,7 @@
   justify-content: center;
   filter: drop-shadow(0 0 8px var(--accent-glow));
   transition: filter 0.3s ease;
+  flex-shrink: 0;
 }
 
 .fan-icon--idle {
@@ -82,8 +93,18 @@
   opacity: 0.5;
 }
 
+/*
+ * 旋转动画：用 animation-duration CSS 变量控制；断电时由 .fan-icon--idle 显式
+ * 关闭 animation（不依赖 --fan-dur=0s，避免动画在 0s 内跑完瞬间的 transform 异常）
+ */
 .fan-icon__rotor {
   animation: fan-spin var(--fan-dur, 1s) linear infinite;
+  transform-origin: 32px 32px;
+}
+
+.fan-icon--idle .fan-icon__rotor {
+  animation: none;
+  transform: rotate(0deg);
 }
 
 @keyframes fan-spin {
@@ -95,15 +116,16 @@
 /* ===== 控制区：[-]  [█████]  [+] ===== */
 .fan-speed__controls {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  align-items: center;       /* 上下居中 */
+  justify-content: center;
+  gap: 10px;
   width: 100%;
 }
 
 .fan-speed__step-btn {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 1px solid var(--border-color);
   background: var(--bg-card);
@@ -132,18 +154,19 @@
   cursor: not-allowed;
 }
 
-/* ===== 5 段 segment ===== */
+/* ===== 5 段 segment（加粗：能量柱高、容器也高） ===== */
 .fan-speed__segments {
   flex: 1;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 4px;
-  height: 56px;
-  padding: 4px;
+  gap: 5px;
+  height: 72px;                       /* 整体加高：56 → 72 */
+  padding: 6px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   cursor: pointer;
+  align-items: center;                /* segment 内部上下居中 */
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -161,18 +184,19 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
-  gap: 2px;
-  padding: 6px 2px 4px;
+  justify-content: center;            /* 上下居中：数字 + 能量柱在 segment 内垂直居中 */
+  gap: 4px;
+  padding: 4px 2px;
   border: 0;
   background: transparent;
   border-radius: 10px;
   color: var(--text-muted);
   cursor: pointer;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.5px;
+  height: 100%;
   transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease;
 }
 
@@ -185,11 +209,11 @@
   transform: scale(0.94);
 }
 
-/* 段下方的"条"：表示能量柱 */
+/* 段下方的"条"：表示能量柱（加粗） */
 .fan-speed__segment-bar {
   display: block;
   width: 100%;
-  height: 6px;
+  height: 14px;                       /* 能量柱加粗：6 → 14 */
   border-radius: 999px;
   background: var(--dial-track);
   transition: background 0.25s ease, box-shadow 0.25s ease, height 0.2s ease;
@@ -218,10 +242,4 @@
 .fan-speed__segment--lit .fan-speed__segment-num {
   opacity: 1;
   color: var(--accent-primary);
-}
-
-/* 当前档额外强调 */
-.fan-speed__segment--lit:last-child,
-.fan-speed__segments:hover .fan-speed__segment--lit {
-  /* placeholder — 占位避免空规则警告 */
 }

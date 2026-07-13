@@ -96,7 +96,7 @@ export function FanSpeedControl({
       className={`fan-speed ${isInactive ? 'fan-speed--inactive' : ''}`}
       data-active-level={safe}
     >
-      {/* 顶部：风 icon + 大档位数字 + 单位 */}
+      {/* 顶部：风 icon + 大档位数字 + 单位（同一行，左右居中） */}
       <div className="fan-speed__display">
         <FanIcon level={safe} active={!isInactive} />
         <div className="fan-speed__readout">
@@ -188,18 +188,18 @@ function PlusIcon() {
 /**
  * 旋转风叶 icon：
  * - 档位越高，扇叶越多/越"实"，旋转越快
- * - 自动 / 关闭态时静止、半透明
+ * - 关闭态时静止、半透明（用 .fan-icon--idle class 关闭 animation，避免 0s 动画副作用）
  */
 function FanIcon({ level, active }: { level: number; active: boolean }) {
   const l = Math.max(1, Math.min(LEVELS, level));
   // 不同档位扇叶数不同：1=2 叶, 2=3 叶, 3=3 叶, 4=4 叶, 5=4 叶
   const bladeCount = l <= 1 ? 2 : l <= 3 ? 3 : 4;
-  const dur = active ? Math.max(0.4, 1.6 - l * 0.25) : 0;
+  const dur = active ? Math.max(0.4, 1.6 - l * 0.25) : undefined;
 
   return (
     <div
       className={`fan-icon ${active ? 'fan-icon--active' : 'fan-icon--idle'}`}
-      style={{ ['--fan-dur' as string]: `${dur}s` }}
+      style={dur !== undefined ? { ['--fan-dur' as string]: `${dur}s` } : undefined}
       aria-hidden="true"
     >
       <svg viewBox="0 0 64 64" width="64" height="64">
