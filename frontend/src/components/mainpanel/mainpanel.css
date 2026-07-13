@@ -150,7 +150,7 @@
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 999px;
-  margin: 8px auto 0;                  /* 配合 main-panel gap(12) 让 stage 底 → chip 顶 = 20px */
+  margin: -8px auto 0;                  /* 配合 main-panel gap(12) 让 stage 底 → chip 顶 = 4px */
   width: fit-content;
 }
 
