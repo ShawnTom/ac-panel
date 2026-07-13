@@ -175,7 +175,7 @@ function App() {
     setOverlayView(view);
   };
 
-  /** 关闭覆盖层：触发滑出动画后卸载 */
+  /** 关闭覆盖层：触发渐出动画后卸载 */
   const closeOverlay = () => {
     if (!overlayView) return;
     setOverlayState('exit');
@@ -186,7 +186,7 @@ function App() {
       }
       setOverlayView(null);
       setOverlayState(null);
-    }, 320); // 与 CSS transition 时长保持一致
+    }, 150); // 与 CSS transition 时长保持一致
   };
 
   const selectedRoom = rooms.find(r => r.id === selectedRoomId) || null;
