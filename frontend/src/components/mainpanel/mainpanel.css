@@ -117,6 +117,31 @@
   pointer-events: none;
 }
 
+/* 通风模式主舞台：和 dial 互斥显示 */
+.main-panel__fan-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 6px;
+  margin-top: -8px;
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+  transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 0.45s ease;
+  pointer-events: auto;
+}
+
+.main-panel__fan-stage--hidden {
+  opacity: 0;
+  transform: scale(0.92);
+  filter: blur(6px);
+  pointer-events: none;
+}
+
 .main-panel__clock {
   position: absolute;
   inset: 0;

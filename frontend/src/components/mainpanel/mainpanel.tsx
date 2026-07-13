@@ -1,7 +1,9 @@
 import { useState, useEffect, type ReactElement } from 'react';
-import type { Room, GlobalSettings, ACMode } from '../../types';
+import type { Room, GlobalSettings, ACMode, FanMode } from '../../types';
 import { Panel } from '../shared/panel';
 import { TemperatureDial } from '../temperaturedial/temperaturedial';
+import { FanSpeed } from '../fanspeed/fanspeed';
+import { FanSpeedDisplay } from '../fanspeeddisplay/fanspeeddisplay';
 import './mainpanel.css';
 
 interface MainPanelProps {
@@ -89,11 +91,25 @@ export function MainPanel({
     onRoomUpdate({ ...room, acTemp: temp });
   };
 
+  const handleFanSpeedChange = (speed: number) => {
+    onRoomUpdate({ ...room, fanSpeed: speed });
+  };
+
+  const handleFanModeChange = (mode: FanMode) => {
+    onRoomUpdate({ ...room, fanMode: mode });
+  };
+
   const isPoweredOn = settings.power && room.power;
 
   // 关闭时显示当前模式（默认 cool），打开时切换模式只在前三个之间选
   const activeMode: ModeKey =
     settings.currentMode === 'auto' ? 'cool' : (settings.currentMode as ModeKey);
+
+  // 通风模式下主区显示风量档/自动-手动；其他模式保留温度调节
+  const isVentMode = activeMode === 'wind';
+  const fanSpeed = room.fanSpeed ?? 1;
+  const fanMode: FanMode = room.fanMode ?? 'manual';
+  const fanAdjustable = room.fanAdjustable !== false; // 默认 true
 
   return (
     <Panel className={`main-panel ${!isPoweredOn ? 'main-panel--off' : ''}`}>
@@ -114,11 +130,26 @@ export function MainPanel({
         </button>
       </div>
 
-      {/* Center: dial ↔ off clock cross-fade */}
+      {/* Center: dial ↔ fan-display ↔ off clock 三态切换 */}
       <div className="main-panel__stage">
+        {/* 通风模式：风量显示 + 自动/手动切换（fanAdjustable 时显示） */}
         <div
-          className={`main-panel__dial-wrapper ${!isPoweredOn ? 'main-panel__dial-wrapper--hidden' : ''}`}
-          aria-hidden={!isPoweredOn}
+          className={`main-panel__fan-stage ${(isPoweredOn && isVentMode && fanAdjustable) ? '' : 'main-panel__fan-stage--hidden'}`}
+          aria-hidden={!(isPoweredOn && isVentMode && fanAdjustable)}
+        >
+          <FanSpeedDisplay
+            speed={fanSpeed}
+            mode={fanMode}
+            disabled={!isPoweredOn}
+            onSpeedChange={handleFanSpeedChange}
+            onModeChange={handleFanModeChange}
+          />
+        </div>
+
+        {/* 制冷/制热：温度旋钮 */}
+        <div
+          className={`main-panel__dial-wrapper ${(isPoweredOn && !isVentMode) ? '' : 'main-panel__dial-wrapper--hidden'}`}
+          aria-hidden={!(isPoweredOn && !isVentMode)}
         >
           <TemperatureDial
             value={room.acTemp}
@@ -129,6 +160,7 @@ export function MainPanel({
           />
         </div>
 
+        {/* 关闭时显示当前时间 */}
         <div
           className={`main-panel__clock ${!isPoweredOn ? 'main-panel__clock--visible' : ''}`}
           aria-hidden={isPoweredOn}
@@ -140,7 +172,7 @@ export function MainPanel({
       </div>
 
       {/* 当前温度 / 当前湿度 信息卡 — 开关和温度调节中间 */}
-      {isPoweredOn && (
+      {isPoweredOn && !isVentMode && (
         <div className="main-panel__info-row">
           <div className="main-panel__info-card">
             <span className="main-panel__info-icon" aria-hidden="true">
@@ -164,6 +196,18 @@ export function MainPanel({
               <span className="main-panel__info-value">{room.humidity}%</span>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* 通风模式 + fanAdjustable + 手动：显示 progress 风量调节条；
+          自动模式不显示（风量由系统决定，用户不应干预） */}
+      {isPoweredOn && isVentMode && fanAdjustable && fanMode === 'manual' && (
+        <div className="main-panel__fan-row">
+          <span className="main-panel__fan-label">风量</span>
+          <FanSpeed
+            value={fanSpeed}
+            onChange={handleFanSpeedChange}
+          />
         </div>
       )}
 

@@ -9,6 +9,9 @@ export const mockRooms: Room[] = [
     humidity: 55,
     power: true,
     mode: 'cool',
+    fanSpeed: 3,
+    fanMode: 'manual',
+    fanAdjustable: true,
   },
   {
     id: 'master-bedroom',
@@ -17,6 +20,9 @@ export const mockRooms: Room[] = [
     indoorTemp: 25,
     humidity: 50,
     power: true,
+    fanSpeed: 2,
+    fanMode: 'auto',
+    fanAdjustable: true,
   },
   {
     id: 'second-bedroom',
@@ -25,6 +31,7 @@ export const mockRooms: Room[] = [
     indoorTemp: 27,
     humidity: 58,
     power: false,
+    fanAdjustable: false,
   },
   {
     id: 'study',
@@ -33,6 +40,9 @@ export const mockRooms: Room[] = [
     indoorTemp: 24,
     humidity: 48,
     power: true,
+    fanSpeed: 1,
+    fanMode: 'manual',
+    fanAdjustable: true,
   },
   {
     id: 'kitchen',
@@ -41,6 +51,7 @@ export const mockRooms: Room[] = [
     indoorTemp: 30,
     humidity: 65,
     power: false,
+    fanAdjustable: false,
   },
   {
     id: 'kids-room',
@@ -49,6 +60,9 @@ export const mockRooms: Room[] = [
     indoorTemp: 25,
     humidity: 52,
     power: true,
+    fanSpeed: 2,
+    fanMode: 'auto',
+    fanAdjustable: true,
   },
 ];
 

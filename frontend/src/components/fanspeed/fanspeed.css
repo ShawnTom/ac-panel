@@ -1,0 +1,73 @@
+.fan-speed {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.fan-speed__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.fan-speed__track {
+  position: relative;
+  flex: 1;
+  height: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.fan-speed__fill {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  border-radius: 999px;
+  box-shadow: 0 0 6px var(--accent-glow);
+  transition: width 0.25s ease;
+  pointer-events: none;
+}
+
+/* 隐藏式按钮：覆盖在 track 上，按 1/5 等分点击 */
+.fan-speed__seg {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.fan-speed__seg::before {
+  /* 视觉刻度点 */
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border-color);
+  transform: translate(-50%, -50%);
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.fan-speed__seg.is-active::before {
+  background: var(--accent-secondary);
+  box-shadow: 0 0 6px var(--accent-glow);
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+.fan-speed__seg:hover::before {
+  border-color: var(--accent-primary);
+}
