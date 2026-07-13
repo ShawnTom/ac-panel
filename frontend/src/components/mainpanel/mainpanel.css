@@ -5,6 +5,17 @@
   gap: 10px;                           /* 收紧 main-panel 子元素之间的 gap */
 }
 
+/* 通风模式专用：stage 和 chip 紧贴、chip 和 info-row 紧贴 */
+.main-panel--vent .main-panel__stage {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* chip 用普通流，紧贴 stage 底和 info-row 顶 — 通过减小 main-panel gap 实现 */
+.main-panel--vent {
+  gap: 4px;                            /* 通风模式下所有 gap 收紧到 4px */
+}
+
 .main-panel--off {
   opacity: 1;
 }
@@ -123,8 +134,7 @@
   inset: 0;
   display: flex;
   justify-content: center;
-  align-items: flex-end;             /* 偏下，让 FanSpeedControl 靠近下方 chip */
-  padding-bottom: 4px;                /* 与 chip 之间留 4px 净距 */
+  align-items: flex-end;             /* 偏下，让 FanSpeedControl 紧贴 stage 底部 */
   opacity: 1;
   transform: scale(1);
   filter: blur(0);
@@ -141,7 +151,7 @@
   pointer-events: none;
 }
 
-/* 通风模式：自动/手动 切换（保留 chip 形态）*/
+/* 通风模式：自动/手动 切换 — 紧贴 stage 底，与风量调节绑为一组 */
 .main-panel__mode-toggle-row {
   display: flex;
   align-items: center;
@@ -151,9 +161,9 @@
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 999px;
-  margin: 0 auto;                       /* 正常布局流，不再用负 margin 覆盖上层 */
+  margin: 0 auto;                       /* 通风模式下由 .main-panel--vent 规则覆盖 */
   width: fit-content;
-  flex-shrink: 0;                       /* 防止被挤压 */
+  flex-shrink: 0;
 }
 
 .main-panel__mode-toggle {

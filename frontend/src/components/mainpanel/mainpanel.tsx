@@ -111,7 +111,9 @@ export function MainPanel({
   const fanAdjustable = room.fanAdjustable !== false; // 默认 true
 
   return (
-    <Panel className={`main-panel ${!isPoweredOn ? 'main-panel--off' : ''}`}>
+    <Panel
+      className={`main-panel ${!isPoweredOn ? 'main-panel--off' : ''} ${isPoweredOn && isVentMode && fanAdjustable ? 'main-panel--vent' : ''}`}
+    >
       {/* Header — 房间名 + 时间并列：房间名左、时间右 */}
       <div className="main-panel__header">
         <div className="main-panel__room-info">
@@ -169,7 +171,27 @@ export function MainPanel({
         </div>
       </div>
 
-      {/* 当前温度 / 当前湿度 信息卡 — 所有开机模式都显示 */}
+      {/* 通风模式：自动/手动 切换 — 紧贴 stage 下方，与风量调节绑为一组 */}
+      {isPoweredOn && isVentMode && fanAdjustable && (
+        <div className="main-panel__mode-toggle-row">
+          <button
+            className={`main-panel__mode-toggle ${fanMode === 'auto' ? 'is-active' : ''}`}
+            onClick={() => handleFanModeChange('auto')}
+            aria-pressed={fanMode === 'auto'}
+          >
+            自动
+          </button>
+          <button
+            className={`main-panel__mode-toggle ${fanMode === 'manual' ? 'is-active' : ''}`}
+            onClick={() => handleFanModeChange('manual')}
+            aria-pressed={fanMode === 'manual'}
+          >
+            手动
+          </button>
+        </div>
+      )}
+
+      {/* 当前温度 / 当前湿度 信息卡 — 所有开机模式都显示，放在 chip 下方 */}
       {isPoweredOn && (
         <div className="main-panel__info-row">
           <div className="main-panel__info-card">
@@ -194,27 +216,6 @@ export function MainPanel({
               <span className="main-panel__info-value">{room.humidity}%</span>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* 通风模式 + 手动 + 开机时：自动/手动 切换
-          风量值由半圆 dial 直接交互，不需要下方独立 progress 条 */}
-      {isPoweredOn && isVentMode && fanAdjustable && (
-        <div className="main-panel__mode-toggle-row">
-          <button
-            className={`main-panel__mode-toggle ${fanMode === 'auto' ? 'is-active' : ''}`}
-            onClick={() => handleFanModeChange('auto')}
-            aria-pressed={fanMode === 'auto'}
-          >
-            自动
-          </button>
-          <button
-            className={`main-panel__mode-toggle ${fanMode === 'manual' ? 'is-active' : ''}`}
-            onClick={() => handleFanModeChange('manual')}
-            aria-pressed={fanMode === 'manual'}
-          >
-            手动
-          </button>
         </div>
       )}
 
