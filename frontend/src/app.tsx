@@ -51,14 +51,15 @@ function App() {
   // 滑动导航：
   // 左滑(手指右→左) = 前进到右侧屏
   // 右滑(手指左→右) = 回退到左侧屏
+  // 设置页禁用任何滑动手势：只允许用返回按钮退出
   const swipeHandlers = useSwipe({
-    onSwipeLeft: () => {
+    onSwipeLeft: currentView === 'settings' ? undefined : () => {
       // 前进
       if (currentView === 'home') setCurrentView('main');
       else if (currentView === 'main') setCurrentView('room-list');
       // room-list → room 需要已选中房间，不自动跳转
     },
-    onSwipeRight: () => {
+    onSwipeRight: currentView === 'settings' ? undefined : () => {
       // 回退
       if (currentView === 'main') setCurrentView('home');
       else if (currentView === 'room-list') setCurrentView('main');
@@ -66,7 +67,7 @@ function App() {
         setSelectedRoomId(null);
         setCurrentView('room-list');
       }
-      else if (currentView === 'settings') setCurrentView('main');
+      // settings 走返回按钮（swipe 已禁用）
     },
   });
 
@@ -182,8 +183,8 @@ function App() {
       </div>
 
       {/* 顶部跑马灯：三个紧挨的短条暗示首页/主控/房间列表的滚动状态
-          房间详情页（currentView === 'room'）不显示，避免和房间自己的返回按钮视觉冲突 */}
-      {currentView !== 'room' && (
+          房间详情页 / 设置页 不显示（房间有自带返回按钮；设置页独立） */}
+      {currentView !== 'room' && currentView !== 'settings' && (
         <div className="app__marquee" aria-label="页面导航指示">
           {marqueeItems.map((item) => (
             <span
