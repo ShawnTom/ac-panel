@@ -39,11 +39,16 @@
 |------|------|------|
 | id | string | 房间唯一标识 |
 | name | string | 房间名称 |
-| acTemp | number | 空调设定温度（16-32°C） |
+| acTemp | number | 空调设定温度（16-30°C） |
 | indoorTemp | number | 室内实际温度 |
 | humidity | number | 湿度百分比（0-100） |
 | power | boolean | 空调电源状态 |
-| mode | ACMode? | 空调模式（仅主控房间有） |
+| mode | ACMode? | 空调模式（仅总控房间有） |
+| fanSpeed | number? | 风量档 1-5（通风模式） |
+| fanMode | FanMode? | 风量运行模式：`'auto' | 'manual'` |
+| fanAdjustable | boolean? | 是否支持风量显示/调节 |
+
+> **说明**：后端当前类型定义未含风量字段（仅前端使用），后续如需持久化请扩展 `backend/src/types/index.ts` 和 `backend/src/data/mockData.ts`。
 
 ### ACMode（空调模式）
 
@@ -51,15 +56,21 @@
 'cool' | 'heat' | 'wind' | 'auto'
 ```
 
+### FanMode（风量运行模式）
+
+```
+'auto' | 'manual'
+```
+
 ### GlobalSettings（全局设置）
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | theme | ThemeName | 主题名称 |
-| brightness.day | number | 白天亮度（0-100） |
-| brightness.night | number | 夜间亮度（0-100） |
-| currentMode | ACMode | 主控空调当前模式 |
-| power | boolean | 主控电源状态 |
+| brightness.day | number | 白天亮度（0-100，白天 = 8:00-18:00） |
+| brightness.night | number | 夜间亮度（0-100，晚上 = 18:00-8:00） |
+| currentMode | ACMode | 总控空调当前模式 |
+| power | boolean | 总控电源状态 |
 
 ### ThemeName（主题名称）
 
@@ -85,21 +96,27 @@
   "msg": "SUCCESS",
   "data": [
     {
-      "id": "living",
-      "name": "客厅",
-      "acTemp": 26,
-      "indoorTemp": 28,
+      "id": "living-room",
+      "name": "总控",
+      "acTemp": 24,
+      "indoorTemp": 26,
       "humidity": 55,
       "power": true,
-      "mode": "cool"
+      "mode": "cool",
+      "fanSpeed": 3,
+      "fanMode": "manual",
+      "fanAdjustable": true
     },
     {
-      "id": "bedroom",
+      "id": "master-bedroom",
       "name": "主卧",
-      "acTemp": 25,
-      "indoorTemp": 27,
+      "acTemp": 23,
+      "indoorTemp": 25,
       "humidity": 50,
-      "power": true
+      "power": true,
+      "fanSpeed": 2,
+      "fanMode": "auto",
+      "fanAdjustable": true
     }
   ]
 }
@@ -124,13 +141,16 @@
   "code": 0,
   "msg": "SUCCESS",
   "data": {
-    "id": "living",
-    "name": "客厅",
-    "acTemp": 26,
-    "indoorTemp": 28,
+    "id": "living-room",
+    "name": "总控",
+    "acTemp": 24,
+    "indoorTemp": 26,
     "humidity": 55,
     "power": true,
-    "mode": "cool"
+    "mode": "cool",
+    "fanSpeed": 3,
+    "fanMode": "manual",
+    "fanAdjustable": true
   }
 }
 ```
@@ -161,7 +181,7 @@
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| acTemp | number | 否 | 空调温度（16-32°C） |
+| acTemp | number | 否 | 空调温度（16-30°C） |
 | power | boolean | 否 | 电源开关 |
 
 **请求示例**:
@@ -180,10 +200,10 @@
   "code": 0,
   "msg": "SUCCESS",
   "data": {
-    "id": "living",
-    "name": "客厅",
+    "id": "living-room",
+    "name": "总控",
     "acTemp": 24,
-    "indoorTemp": 28,
+    "indoorTemp": 26,
     "humidity": 55,
     "power": true,
     "mode": "cool"
@@ -193,7 +213,7 @@
 
 ---
 
-### 4. 更新空调模式（仅主控房间）
+### 4. 更新空调模式（仅总控房间）
 
 - **方法**: `PUT`
 - **路径**: `/api/rooms/:id/mode`
@@ -201,7 +221,7 @@
 
 | 参数 | 类型 | 说明 |
 |------|------|------|
-| id | string | 房间 ID（必须为主控房间 "living"） |
+| id | string | 房间 ID（必须为总控房间 "living-room"） |
 
 - **请求体**:
 
@@ -224,10 +244,10 @@
   "code": 0,
   "msg": "SUCCESS",
   "data": {
-    "id": "living",
-    "name": "客厅",
-    "acTemp": 26,
-    "indoorTemp": 28,
+    "id": "living-room",
+    "name": "总控",
+    "acTemp": 24,
+    "indoorTemp": 26,
     "humidity": 55,
     "power": true,
     "mode": "heat"
@@ -235,7 +255,7 @@
 }
 ```
 
-**错误响应（非主控房间）**:
+**错误响应（非总控房间）**:
 
 ```json
 {
@@ -260,10 +280,10 @@
   "code": 0,
   "msg": "SUCCESS",
   "data": {
-    "theme": "black-gold",
+    "theme": "tech-blue-purple",
     "brightness": {
-      "day": 80,
-      "night": 30
+      "day": 100,
+      "night": 70
     },
     "currentMode": "cool",
     "power": true
@@ -292,7 +312,7 @@
   "theme": "tech-blue-purple",
   "brightness": {
     "day": 90,
-    "night": 20
+    "night": 50
   }
 }
 ```
@@ -307,7 +327,7 @@
     "theme": "tech-blue-purple",
     "brightness": {
       "day": 90,
-      "night": 20
+      "night": 50
     },
     "currentMode": "cool",
     "power": true
@@ -317,7 +337,7 @@
 
 ---
 
-### 7. 更新主控空调模式
+### 7. 更新总控空调模式
 
 - **方法**: `PUT`
 - **路径**: `/api/settings/mode`
@@ -342,10 +362,10 @@
   "code": 0,
   "msg": "SUCCESS",
   "data": {
-    "theme": "black-gold",
+    "theme": "tech-blue-purple",
     "brightness": {
-      "day": 80,
-      "night": 30
+      "day": 100,
+      "night": 70
     },
     "currentMode": "auto",
     "power": true
@@ -390,7 +410,7 @@
   "msg": "SUCCESS",
   "data": {
     "timestamp": 1720527600000,
-    "iso": "2026-07-09T11:00:00.000Z"
+    "iso": "2026-07-13T11:00:00.000Z"
   }
 }
 ```
@@ -401,12 +421,25 @@
 
 | ID | 名称 | 备注 |
 |----|------|------|
-| living | 客厅 | 主控房间 |
-| bedroom | 主卧 | |
-| guest | 次卧 | |
+| living-room | 总控 | 主控房间 |
+| master-bedroom | 主卧 | |
+| second-bedroom | 次卧 | |
 | study | 书房 | |
 | kitchen | 厨房 | |
-| kids | 儿童房 | |
+| kids-room | 儿童房 | |
+
+---
+
+## 输入验证规则
+
+- 温度范围：16–30°C（超出返回 400）
+- 白天亮度：0–100（后端未做最低保护，前端最低 50%）
+- 夜间亮度：0–100（后端未做最低保护，前端最低 30%）
+- 空调模式枚举：cool / heat / wind / auto
+- 电源类型：boolean
+- 非主控房间调用模式更新返回 403
+
+---
 
 ## 启动方式
 
@@ -425,3 +458,12 @@ npm start
 ```
 
 默认监听端口: **3001**
+
+---
+
+## 后续待补充
+
+- [ ] 后端支持风量字段（`fanSpeed` / `fanMode` / `fanAdjustable`）持久化
+- [ ] WebSocket 推送接口
+- [ ] 用户认证
+- [ ] 数据库持久化（当前是内存 Mock）
