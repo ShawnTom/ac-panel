@@ -3,7 +3,7 @@ import type { Room, GlobalSettings } from '../types';
 export const mockRooms: Room[] = [
   {
     id: 'living-room',
-    name: '客厅',
+    name: '总控',
     acTemp: 24,
     indoorTemp: 26,
     humidity: 55,

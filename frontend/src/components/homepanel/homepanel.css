@@ -180,12 +180,19 @@
   backdrop-filter: blur(10px);
 }
 
-/* 平均温度/湿度卡片：icon + 文字同一行，间距 6px，整体高度更扁 */
-.home-panel__data-card--inline {
+/* 平均温度/湿度卡片：第一行 icon+label，第二行 value，上下两行整体居中 */
+.home-panel__data-card--stacked {
+  align-items: center;
+  gap: 6px;
+  padding: 12px 12px;
+}
+
+.home-panel__data-header {
+  display: flex;
   flex-direction: row;
+  align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 10px 12px;
 }
 
 .home-panel__data-card--wide {

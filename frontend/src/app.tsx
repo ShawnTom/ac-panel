@@ -4,6 +4,8 @@ import { mockRooms, mockGlobalSettings } from './mock/data';
 import { useTheme } from './hooks/usetheme';
 import { useBrightness } from './hooks/usebrightness';
 import { useSwipe } from './hooks/useswipe';
+import { useToast } from './hooks/usetoast';
+import './hooks/toast.css';
 import { HomePanel } from './components/homepanel/homepanel';
 import { MainPanel } from './components/mainpanel/mainpanel';
 import { RoomPanel } from './components/roompanel/roompanel';
@@ -42,6 +44,8 @@ function App() {
     previewCountdown,
     previewValue,
   } = useBrightness(globalSettings.brightness);
+  // 顶层 toast：用于跨页面的提示（如总控关闭时单独开房间的提示）
+  const { toast, showToast } = useToast();
 
   // 主题切换
   useEffect(() => {
@@ -96,6 +100,40 @@ function App() {
     setRooms(prev => prev.map(r => ({ ...r, power: newPower })));
   };
 
+  /**
+   * 校验：总控关闭时，单独打开某个房间不允许
+   * 用于房间列表的 power 按钮（要打开）和房间详情页的 power 按钮（要打开）
+   */
+  const requireMasterPower = (room: Room, nextPower: boolean): boolean => {
+    if (!globalSettings.power && nextPower) {
+      showToast('请先打开总控开关');
+      return false;
+    }
+    return true;
+  };
+
+  /**
+   * 房间列表的 power 按钮：包装 onRoomPowerToggle 加入总控校验
+   */
+  const handleRoomPowerToggleWithGuard = (room: Room) => {
+    const nextPower = !room.power;
+    if (!requireMasterPower(room, nextPower)) return;
+    handleRoomUpdate({ ...room, power: nextPower });
+  };
+
+  /**
+   * 房间详情页 power 按钮：只允许"开启"动作（关闭不受总控限制）
+   */
+  const handleRoomPanelPowerToggle = (room: Room) => {
+    const nextPower = !room.power;
+    if (!requireMasterPower(room, nextPower)) return;
+    // 开启时若总控关闭（理论已被拦截）确保总控也开
+    if (!globalSettings.power && nextPower) {
+      handleGlobalUpdate({ power: true });
+    }
+    handleRoomUpdate({ ...room, power: nextPower });
+  };
+
   const handleModeChange = (mode: ACMode) => {
     handleGlobalUpdate({ currentMode: mode });
     // 通风模式：同步所有房间切换到通风，并确保它们有风量档/模式/可调
@@ -140,7 +178,7 @@ function App() {
           <RoomList
             rooms={rooms}
             onRoomSelect={handleRoomSelect}
-            onRoomPowerToggle={(room) => handleRoomUpdate({ ...room, power: !room.power })}
+            onRoomPowerToggle={handleRoomPowerToggleWithGuard}
             onBack={() => setCurrentView('main')}
             onSettingsClick={() => setCurrentView('settings')}
           />
@@ -157,12 +195,7 @@ function App() {
                 setCurrentView('room-list');
               }}
               onModeChange={handleModeChange}
-              onPowerToggle={() => {
-                if (!globalSettings.power) {
-                  handleGlobalUpdate({ power: true });
-                }
-                handleRoomUpdate({ ...selectedRoom, power: !selectedRoom.power });
-              }}
+              onPowerToggle={() => handleRoomPanelPowerToggle(selectedRoom)}
               onRoomUpdate={handleRoomUpdate}
             />
           )}
@@ -194,6 +227,11 @@ function App() {
           ))}
         </div>
       )}
+
+      {/* 顶层跨页面 toast：总控关闭时单独开房间的提示等 */}
+      <div className={`toast ${toast.visible ? 'toast--visible' : ''}`}>
+        {toast.message}
+      </div>
     </div>
   );
 }
