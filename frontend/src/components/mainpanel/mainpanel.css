@@ -5,15 +5,16 @@
   gap: 10px;                           /* 收紧 main-panel 子元素之间的 gap */
 }
 
-/* 通风模式专用：stage 和 chip 紧贴、chip 和 info-row 紧贴 */
+/* 通风模式专用：stage 和 chip 紧贴、chip 和 info-row 紧贴
+   但 info-row 到 power-pill 间距保持与制冷/制热一致（main-panel gap 10px）*/
 .main-panel--vent .main-panel__stage {
   flex: 1 1 auto;
   min-height: 0;
 }
 
-/* chip 用普通流，紧贴 stage 底和 info-row 顶 — 通过减小 main-panel gap 实现 */
-.main-panel--vent {
-  gap: 4px;                            /* 通风模式下所有 gap 收紧到 4px */
+.main-panel--vent .main-panel__mode-toggle-row {
+  margin-top: -6px;                    /* 抵消 main-panel gap(10)，让 chip 距 stage 底 = 4px */
+  margin-bottom: -6px;                 /* 抵消 main-panel gap(10)，让 chip 距 info-row 顶 = 4px */
 }
 
 .main-panel--off {
