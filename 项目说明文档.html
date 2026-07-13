@@ -18,6 +18,7 @@
   --green: #55efc4;
   --orange: #ffa502;
   --blue: #5b9cff;
+  --red: #ff6b6b;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
@@ -39,11 +40,15 @@ td:first-child { color:var(--text); }
 .badge-green { background:rgba(85,239,196,0.15); color:var(--green); }
 .badge-blue { background:rgba(91,156,255,0.15); color:var(--blue); }
 .badge-orange { background:rgba(255,165,2,0.15); color:var(--orange); }
+.badge-red { background:rgba(255,107,107,0.15); color:var(--red); }
+.badge-muted { background:rgba(156,163,181,0.15); color:var(--text-3); }
 .subtitle { color:var(--text-3); font-size:14px; margin-bottom:24px; }
-.tree { background:var(--card); padding:16px 20px; border-radius:8px; font-family:'Courier New',monospace; font-size:13px; line-height:1.8; color:var(--text-2); border:1px solid var(--border); }
+.tree { background:var(--card); padding:16px 20px; border-radius:8px; font-family:'Courier New',monospace; font-size:13px; line-height:1.8; color:var(--text-2); border:1px solid var(--border); overflow-x:auto; }
 .tree .dir { color:var(--accent-2); }
 .note { background:rgba(91,156,255,0.08); border:1px solid rgba(91,156,255,0.2); border-radius:8px; padding:12px 16px; margin:12px 0; font-size:14px; }
 .note strong { color:var(--blue); }
+ul { margin:8px 0 8px 20px; color:var(--text-2); }
+li { margin-bottom:4px; }
 </style>
 </head>
 <body>
@@ -52,18 +57,20 @@ td:first-child { color:var(--text); }
 <h1>智能空调控制面板 — 项目说明文档</h1>
 <p class="subtitle">480×480px 智能家居空调控制面板系统，含前端交互原型和后端 API 预留</p>
 
-<blockquote>本项目为智能家居空调控制面板的原型系统，面板尺寸 <strong>480×480px</strong>，适用于嵌入式触控屏或智能家居中控设备。系统采用前后端分离架构，前端使用 React + TypeScript + Vite，后端使用 Express + TypeScript，当前阶段前端使用 Mock 数据独立运行，后端 API 已预留完整接口供后续对接。</blockquote>
+<blockquote>本项目为智能家居空调控制面板的原型系统，面板尺寸 <strong>480×480px</strong>，适用于嵌入式触控屏或智能家居中控设备。系统采用前后端分离架构，前端使用 React 18 + TypeScript + Vite 6，后端使用 Express 4 + TypeScript，当前阶段前端使用 Mock 数据独立运行，后端 API 已预留完整接口供后续对接。通过 Vercel 自动部署（GitHub push 触发 re-deploy）。</blockquote>
 
 <h2>一、核心功能</h2>
 <table>
-<tr><th>功能</th><th>主控面板（客厅）</th><th>房间面板</th><th>首页</th></tr>
-<tr><td>空调模式切换（制冷/制热/送风）</td><td><span class="badge badge-green">可操作</span></td><td><span class="badge badge-orange">仅展示</span></td><td>—</td></tr>
-<tr><td>温度调节（半圆旋钮，16–30°C）</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td>—</td></tr>
-<tr><td>开关机</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">一键启动/关闭</span></td></tr>
-<tr><td>主题切换（黑金/灰白/蓝紫）</td><td><span class="badge badge-green">设置页</span></td><td>—</td><td>—</td></tr>
-<tr><td>亮度调节（白天/夜间）</td><td><span class="badge badge-green">设置页</span></td><td>—</td><td>—</td></tr>
-<tr><td>室内环境监测</td><td>—</td><td>—</td><td><span class="badge badge-green">温度/湿度/PM2.5/CO2/VOC</span></td></tr>
-<tr><td>滑动导航</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td></tr>
+<tr><th>功能</th><th>总控面板</th><th>房间面板</th><th>首页</th><th>设置页</th></tr>
+<tr><td>空调模式切换（制冷/制热/通风）</td><td><span class="badge badge-green">可操作</span></td><td><span class="badge badge-orange">仅展示</span></td><td>—</td><td>—</td></tr>
+<tr><td>温度调节（半圆旋钮，16–30°C）</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td>—</td><td>—</td></tr>
+<tr><td>风量调节（5 档 + 自动/手动）</td><td><span class="badge badge-green">通风模式</span></td><td><span class="badge badge-green">通风模式</span></td><td>—</td><td>—</td></tr>
+<tr><td>房间电源开关</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">一键启停</span></td><td>—</td></tr>
+<tr><td>主题切换（黑金/灰白/蓝紫）</td><td>—</td><td>—</td><td>—</td><td><span class="badge badge-green">✓</span></td></tr>
+<tr><td>亮度调节（白天 8:00-18:00 / 晚上 18:00-8:00）</td><td>—</td><td>—</td><td>—</td><td><span class="badge badge-green">跨时段 3 秒预览</span></td></tr>
+<tr><td>室内环境监测</td><td>—</td><td>—</td><td><span class="badge badge-green">温/湿/PM2.5/CO2/VOC</span></td><td>—</td></tr>
+<tr><td>总控电源校验</td><td>—</td><td colspan="3"><span class="badge badge-orange">总控关闭 → 单独开房间 toast 拦截</span></td></tr>
+<tr><td>滑动导航</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-red">禁用</span></td></tr>
 </table>
 
 <h2>二、技术栈</h2>
@@ -75,6 +82,7 @@ td:first-child { color:var(--text); }
 <tr><td>样式方案</td><td>纯 CSS 变量</td><td>三套主题通过 data-theme 属性切换</td></tr>
 <tr><td>后端框架</td><td>Express 4</td><td>RESTful API</td></tr>
 <tr><td>后端语言</td><td>TypeScript</td><td>ts-node 运行</td></tr>
+<tr><td>部署</td><td>Vercel</td><td>GitHub push 自动触发 re-deploy</td></tr>
 </table>
 
 <h2>三、项目结构</h2>
@@ -84,17 +92,23 @@ td:first-child { color:var(--text); }
 │   ├── <span class="dir">src/</span><br>
 │   │   ├── <span class="dir">components/</span><br>
 │   │   │   ├── <span class="dir">homepanel/</span>         # 首页（环境监测）<br>
-│   │   │   ├── <span class="dir">mainpanel/</span>         # 主控面板（客厅）<br>
+│   │   │   ├── <span class="dir">mainpanel/</span>         # 总控面板<br>
 │   │   │   ├── <span class="dir">roompanel/</span>         # 房间面板<br>
-│   │   │   ├── <span class="dir">roomlist/</span>          # 房间列表<br>
+│   │   │   ├── <span class="dir">roomlist/</span>          # 房间列表（右上角设置按钮）<br>
 │   │   │   ├── <span class="dir">temperaturedial/</span>   # 半圆温度旋钮<br>
+│   │   │   ├── <span class="dir">fanspeedcontrol/</span>  # 风量调节（5 档+自动/手动）<br>
 │   │   │   ├── <span class="dir">globalsettings/</span>    # 全局设置<br>
 │   │   │   └── <span class="dir">shared/</span>            # 共享容器<br>
-│   │   ├── <span class="dir">hooks/</span>                 # 主题/亮度/滑动/Toast<br>
+│   │   ├── <span class="dir">hooks/</span><br>
+│   │   │   ├── usetheme.ts            # 主题切换<br>
+│   │   │   ├── usebrightness.ts       # 亮度+跨时段预览<br>
+│   │   │   ├── useswipe.ts            # 滑动手势<br>
+│   │   │   └── usetoast.ts            # Toast 提示<br>
 │   │   ├── <span class="dir">themes/</span>                # 三套主题 CSS<br>
-│   │   ├── <span class="dir">types/</span>                 # 类型定义<br>
-│   │   ├── <span class="dir">mock/</span>                  # Mock 数据<br>
-│   │   ├── App.tsx                          # 根组件<br>
+│   │   ├── <span class="dir">types/</span>                 # 类型定义（含 FanMode）<br>
+│   │   ├── <span class="dir">mock/</span>                  # Mock 数据（含风量字段）<br>
+│   │   ├── app.tsx                          # 根组件（视图路由+总控校验）<br>
+│   │   ├── app.css                          # 全局样式<br>
 │   │   └── main.tsx                         # 入口<br>
 │   ├── index.html<br>
 │   ├── vite.config.ts<br>
@@ -108,7 +122,9 @@ td:first-child { color:var(--text); }
 │   │   └── index.ts                         # 入口<br>
 │   ├── api.md                              # API 文档<br>
 │   └── package.json<br>
-└── README.md                               # 本文档
+├── <span class="dir">DELIVERY/</span>                      # 早期交付备份<br>
+├── <span class="dir">项目说明文档.html</span>                # 本文档（HTML 版）<br>
+└── readme.md                              # 本文档（Markdown 版）
 </div>
 
 <h2>四、前端核心组件</h2>
@@ -122,13 +138,25 @@ td:first-child { color:var(--text); }
 <p>• <strong>视觉</strong>：渐变进度弧 + 刻度线 + 旋钮 + 中央大号数字</p>
 </div>
 
+<h3>FanSpeedControl（风量调节，通风模式专用）</h3>
+<div class="card">
+<p>• <strong>5 个风量档</strong>：1~5 档，垂直细长条（14×40）+ 档位数字</p>
+<p>• <strong>运行模式切换</strong>：自动 / 手动 两个 chip</p>
+<p>• <strong>手动模式</strong>：用户点击档位直接设置风量</p>
+<p>• <strong>自动模式</strong>：风扇持续转动 + 5 段"充电"跑马灯（从 0 累加到 5，2.5s 循环），整体不可交互</p>
+<p>• <strong>实现</strong>：纯 CSS 关键帧 + <code>:nth-child()</code> 设置不同 animation-delay（避开 transform: scaleY 黑屏风险）</p>
+</div>
+
 <h3>视图架构</h3>
 <div class="card">
 <p>采用 <strong>track + translateX</strong> 滑动架构，5 个视图横向排列：</p>
-<p><code>首页 → 主控面板 → 房间列表 → 房间面板 → 设置页</code></p>
-<p>• 左滑前进，右滑后退</p>
-<p>• 所有视图同时渲染，CSS transform 控制位置</p>
-<p>• 每个视图占 20% 宽度，track 总宽 500%</p>
+<p><code>首页 → 总控面板 → 房间列表 → 房间面板 → 设置页</code></p>
+<ul>
+<li>左滑前进，右滑后退</li>
+<li>所有视图同时渲染，CSS transform 控制位置</li>
+<li>设置页禁用滑动手势（<code>onSwipeLeft</code> / <code>onSwipeRight</code> 传 <code>undefined</code>）</li>
+<li>房间详情页和设置页不显示顶部跑马灯</li>
+</ul>
 </div>
 
 <h3>主题系统</h3>
@@ -140,43 +168,78 @@ td:first-child { color:var(--text); }
 <p>切换时 0.35s 平滑过渡，所有颜色使用 CSS 变量，无硬编码色值。</p>
 </div>
 
+<h3>亮度系统</h3>
+<div class="card">
+<p>• <code>useBrightness</code> hook 每分钟检测当前时间</p>
+<p>• <strong>白天：8:00-18:00 / 晚上：18:00-8:00</strong></p>
+<p>• 通过 <code>#root { filter: brightness(X%) }</code> 应用亮度</p>
+<p>• 最低可读性保护：白天不低于 50%、夜间不低于 30%</p>
+<p>• <strong>跨时段预览</strong>：白天调夜间/夜间调白天滑块时，临时预览 3 秒 + toast 倒计时（3→2→1 秒），3 秒后自动恢复当前时段真实亮度（用 ref 锁住最新值避免 useEffect 时序问题）</p>
+</div>
+
 <h2>五、后端 API 接口</h2>
 <table>
 <tr><th>方法</th><th>路径</th><th>说明</th></tr>
 <tr><td>GET</td><td>/api/rooms</td><td>获取所有房间</td></tr>
 <tr><td>GET</td><td>/api/rooms/:id</td><td>获取单个房间</td></tr>
 <tr><td>PUT</td><td>/api/rooms/:id</td><td>更新房间（温度/电源）</td></tr>
-<tr><td>PUT</td><td>/api/rooms/:id/mode</td><td>更新模式（仅主控）</td></tr>
+<tr><td>PUT</td><td>/api/rooms/:id/mode</td><td>更新模式（仅总控）</td></tr>
 <tr><td>GET</td><td>/api/settings</td><td>获取全局设置</td></tr>
 <tr><td>PUT</td><td>/api/settings</td><td>更新全局设置</td></tr>
+<tr><td>PUT</td><td>/api/settings/mode</td><td>更新总控模式</td></tr>
 <tr><td>GET</td><td>/api/health</td><td>健康检查</td></tr>
 <tr><td>GET</td><td>/api/time</td><td>获取服务器时间</td></tr>
 </table>
 <p>统一响应格式：<code>{ "code": 0, "msg": "SUCCESS", "data": {...} }</code></p>
+<p>温度范围：16–30°C；亮度：0–100；模式枚举：<code>cool / heat / wind / auto</code>；非总控房间调用模式更新返回 403。</p>
 
 <h2>六、交互说明</h2>
 
 <h3>滑动导航</h3>
 <table>
 <tr><th>当前页面</th><th>左滑</th><th>右滑</th></tr>
-<tr><td>首页</td><td>→ 主控面板</td><td>—</td></tr>
-<tr><td>主控面板</td><td>→ 房间列表</td><td>→ 首页</td></tr>
-<tr><td>房间列表</td><td>—</td><td>→ 主控面板</td></tr>
+<tr><td>首页</td><td>→ 总控面板</td><td>—</td></tr>
+<tr><td>总控面板</td><td>→ 房间列表</td><td>→ 首页</td></tr>
+<tr><td>房间列表</td><td>—</td><td>→ 总控面板</td></tr>
 <tr><td>房间面板</td><td>—</td><td>→ 房间列表</td></tr>
-<tr><td>设置页</td><td>—</td><td>→ 主控面板</td></tr>
+<tr><td>设置页</td><td><span class="badge badge-red">禁用</span></td><td><span class="badge badge-red">禁用</span></td></tr>
 </table>
 
 <h3>一键启动/关闭</h3>
 <div class="card">
-<p>首页右上角按钮，点击后同步所有房间的电源状态：</p>
-<p>• <strong>关机时</strong>：显示"一键启动"</p>
-<p>• <strong>开机时</strong>：显示"一键关闭"（反色填充，图标旋转）</p>
+<p>首页右上角按钮，点击后同步所有房间的电源状态 + 总控：</p>
+<ul>
+<li><strong>关机时</strong>：显示"一键启动"</li>
+<li><strong>开机时</strong>：显示"一键关闭"（反色填充，图标旋转）</li>
+</ul>
+</div>
+
+<h3>总控电源校验</h3>
+<div class="card">
+<ul>
+<li>总控（<code>globalSettings.power</code>）关闭时，房间列表或房间详情页单独开启任意房间 → toast "请先打开总控开关"</li>
+<li>关闭动作不受总控限制</li>
+<li>在 <code>app.tsx</code> 顶层用 useToast 拦截，所有页面都能看到提示</li>
+</ul>
+</div>
+
+<h3>亮度跨时段预览</h3>
+<div class="card">
+<ul>
+<li>当前时段滑块（白天调白天/晚上调晚上）→ 直接写入持久配置</li>
+<li>跨时段滑块（白天调晚上/晚上调白天）→ 临时预览 3 秒，3 秒后自动恢复当前时段真实亮度</li>
+<li>预览期间：屏幕亮度实时跟随滑块 + toast 倒计时</li>
+<li>滑块用本地虚拟值显示（不回弹），3 秒后回弹到真实配置位置</li>
+<li>跨时段值<strong>不会</strong>写入持久配置</li>
+</ul>
 </div>
 
 <h3>关机状态</h3>
 <div class="card">
-<p>• 主控/房间面板：面板变暗（opacity 0.5），仅显示时间和电源按钮</p>
-<p>• 首页：不变暗，环境数据正常显示</p>
+<ul>
+<li>总控/房间面板：面板变暗（opacity 0.5），仅显示时间和电源按钮</li>
+<li>首页：不变暗，环境数据正常显示</li>
+</ul>
 </div>
 
 <h2>七、本地部署预览</h2>
@@ -206,23 +269,47 @@ npm run dev</code></pre>
 npm run build      # 输出到 dist/
 npm run preview    # 预览构建结果</code></pre>
 
+<h3>Vercel 部署</h3>
+<p>项目通过 Vercel 与 GitHub 仓库关联，每次 <code>git push origin main</code> 自动触发 re-deploy。无需手动操作。</p>
+
 <h2>八、Mock 数据</h2>
 <table>
-<tr><th>房间</th><th>ID</th><th>默认温度</th></tr>
-<tr><td>客厅（主控）</td><td>living-room</td><td>24°C</td></tr>
-<tr><td>主卧</td><td>master-bedroom</td><td>23°C</td></tr>
-<tr><td>次卧</td><td>second-bedroom</td><td>25°C</td></tr>
-<tr><td>书房</td><td>study</td><td>22°C</td></tr>
-<tr><td>厨房</td><td>kitchen</td><td>26°C</td></tr>
-<tr><td>儿童房</td><td>kids-room</td><td>24°C</td></tr>
+<tr><th>房间</th><th>ID</th><th>默认温度</th><th>风量</th></tr>
+<tr><td>总控</td><td>living-room</td><td>24°C</td><td>3 档 / 手动</td></tr>
+<tr><td>主卧</td><td>master-bedroom</td><td>23°C</td><td>2 档 / 自动</td></tr>
+<tr><td>次卧</td><td>second-bedroom</td><td>25°C</td><td>—</td></tr>
+<tr><td>书房</td><td>study</td><td>22°C</td><td>1 档 / 手动</td></tr>
+<tr><td>厨房</td><td>kitchen</td><td>26°C</td><td>—</td></tr>
+<tr><td>儿童房</td><td>kids-room</td><td>24°C</td><td>2 档 / 自动</td></tr>
 </table>
-<p>前后端使用统一的房间 ID，确保接入真实 API 后无缝切换。</p>
+<p>前后端使用统一的房间 ID（<code>living-room</code> / <code>master-bedroom</code> / <code>second-bedroom</code> / <code>study</code> / <code>kitchen</code> / <code>kids-room</code>），确保接入真实 API 后无缝切换。</p>
 
-<h2>九、后续开发建议</h2>
+<h2>九、近期更新日志</h2>
+<div class="card">
+<ul>
+<li>✅ 总控面板标题由"客厅"改为"总控"（mock data <code>name: '总控'</code>）</li>
+<li>✅ 新增 <code>FanSpeedControl</code> 组件（5 档 + 自动/手动 + 充电动画）</li>
+<li>✅ 通风模式：主区显示风量调节组件替代温度旋钮</li>
+<li>✅ 通风模式：主控切到通风时同步所有房间进入风量可调状态</li>
+<li>✅ 新增 <code>FanMode</code> / <code>fanSpeed</code> / <code>fanAdjustable</code> 字段</li>
+<li>✅ 主页平均温度/湿度卡片改为两行布局（icon+label / value，整体居中）</li>
+<li>✅ 总控关闭时单独开启房间 → toast "请先打开总控开关"（房间列表 + 房间详情页都拦截）</li>
+<li>✅ 亮度系统改为 8:00-18:00 白天 / 18:00-8:00 晚上</li>
+<li>✅ 亮度跨时段调节 3 秒预览 + toast 倒计时（<code>useBrightness</code> 用 ref 锁住最新值）</li>
+<li>✅ 主页 + 房间列表右上角统一设置按钮（无外圆边框）</li>
+<li>✅ 房间详情页 header：返回按钮在最左 + 房间名+时间紧贴右侧 12px</li>
+<li>✅ 房间详情页 + 设置页隐藏顶部跑马灯</li>
+<li>✅ 设置页禁用滑动手势（<code>onSwipeLeft</code> / <code>onSwipeRight</code> 传 <code>undefined</code>）</li>
+<li>✅ 充电动画从 inline style + transform 改为纯 CSS <code>:nth-child()</code> + box-shadow 动画（修复黑屏问题）</li>
+</ul>
+</div>
+
+<h2>十、后续开发建议</h2>
 <table>
 <tr><th>优先级</th><th>事项</th><th>说明</th></tr>
 <tr><td><span class="badge badge-orange">高</span></td><td>前端 API 服务层</td><td>创建 src/api/，封装 fetch、loading/error</td></tr>
 <tr><td><span class="badge badge-orange">高</span></td><td>WebSocket 实时推送</td><td>实时温度同步</td></tr>
+<tr><td><span class="badge badge-blue">中</span></td><td>后端支持风量字段</td><td>持久化 fanSpeed / fanMode / fanAdjustable</td></tr>
 <tr><td><span class="badge badge-blue">中</span></td><td>用户认证</td><td>JWT/Session</td></tr>
 <tr><td><span class="badge badge-blue">中</span></td><td>数据库持久化</td><td>替换内存 Mock</td></tr>
 <tr><td><span class="badge badge-blue">中</span></td><td>触摸事件调优</td><td>实际设备测试</td></tr>
