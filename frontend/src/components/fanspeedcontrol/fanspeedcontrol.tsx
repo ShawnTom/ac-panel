@@ -199,7 +199,7 @@ function FanIcon({ level, active }: { level: number; active: boolean }) {
       style={dur !== undefined ? { ['--fan-dur' as string]: `${dur}s` } : undefined}
       aria-hidden="true"
     >
-      <svg viewBox="0 0 64 64" width="64" height="64">
+      <svg viewBox="0 0 64 64" width="52" height="52">
         <defs>
           <linearGradient id="fan-blade-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="var(--accent-primary)" />

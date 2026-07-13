@@ -169,8 +169,8 @@ export function MainPanel({
         </div>
       </div>
 
-      {/* 当前温度 / 当前湿度 信息卡 — 开关和温度调节中间 */}
-      {isPoweredOn && !isVentMode && (
+      {/* 当前温度 / 当前湿度 信息卡 — 所有开机模式都显示 */}
+      {isPoweredOn && (
         <div className="main-panel__info-row">
           <div className="main-panel__info-card">
             <span className="main-panel__info-icon" aria-hidden="true">

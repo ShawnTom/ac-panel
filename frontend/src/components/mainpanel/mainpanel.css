@@ -1,8 +1,8 @@
 .main-panel {
   display: flex;
   flex-direction: column;
-  padding: 20px 18px 22px;
-  gap: 12px;
+  padding: 16px 18px 18px;
+  gap: 10px;                           /* 收紧 main-panel 子元素之间的 gap */
 }
 
 .main-panel--off {
@@ -150,9 +150,9 @@
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 999px;
-  margin: -56px auto 0;                 /* 大幅上提，让 chip 紧贴 FanSpeedControl 底部的"1-5"数字 */
+  margin: -40px auto 0;                /* 风量调节变扁后，-40px 即可让 chip 紧贴风量条底部数字 */
   width: fit-content;
-  position: relative;                   /* 撑在 fan-stage 内容之上 */
+  position: relative;
   z-index: 1;
 }
 
