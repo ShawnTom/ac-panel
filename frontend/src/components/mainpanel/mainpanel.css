@@ -150,8 +150,10 @@
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 999px;
-  margin: -8px auto 0;                  /* 配合 main-panel gap(12) 让 stage 底 → chip 顶 = 4px */
+  margin: -56px auto 0;                 /* 大幅上提，让 chip 紧贴 FanSpeedControl 底部的"1-5"数字 */
   width: fit-content;
+  position: relative;                   /* 撑在 fan-stage 内容之上 */
+  z-index: 1;
 }
 
 .main-panel__mode-toggle {
