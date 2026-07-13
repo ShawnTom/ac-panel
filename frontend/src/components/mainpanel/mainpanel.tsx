@@ -2,8 +2,7 @@ import { useState, useEffect, type ReactElement } from 'react';
 import type { Room, GlobalSettings, ACMode, FanMode } from '../../types';
 import { Panel } from '../shared/panel';
 import { TemperatureDial } from '../temperaturedial/temperaturedial';
-import { FanSpeed } from '../fanspeed/fanspeed';
-import { FanSpeedDisplay } from '../fanspeeddisplay/fanspeeddisplay';
+import { FanDial } from '../fandial/fandial';
 import './mainpanel.css';
 
 interface MainPanelProps {
@@ -130,19 +129,17 @@ export function MainPanel({
         </button>
       </div>
 
-      {/* Center: dial ↔ fan-display ↔ off clock 三态切换 */}
+      {/* Center: dial ↔ fan-dial ↔ off clock 三态切换 */}
       <div className="main-panel__stage">
-        {/* 通风模式：风量显示 + 自动/手动切换（fanAdjustable 时显示） */}
+        {/* 通风模式：风量拨盘（半圆+5 段+拖拽）；自动模式禁用 */}
         <div
           className={`main-panel__fan-stage ${(isPoweredOn && isVentMode && fanAdjustable) ? '' : 'main-panel__fan-stage--hidden'}`}
           aria-hidden={!(isPoweredOn && isVentMode && fanAdjustable)}
         >
-          <FanSpeedDisplay
-            speed={fanSpeed}
-            mode={fanMode}
-            disabled={!isPoweredOn}
-            onSpeedChange={handleFanSpeedChange}
-            onModeChange={handleFanModeChange}
+          <FanDial
+            value={fanSpeed}
+            onChange={handleFanSpeedChange}
+            disabled={!isPoweredOn || fanMode === 'auto'}
           />
         </div>
 
@@ -199,15 +196,24 @@ export function MainPanel({
         </div>
       )}
 
-      {/* 通风模式 + fanAdjustable + 手动：显示 progress 风量调节条；
-          自动模式不显示（风量由系统决定，用户不应干预） */}
-      {isPoweredOn && isVentMode && fanAdjustable && fanMode === 'manual' && (
-        <div className="main-panel__fan-row">
-          <span className="main-panel__fan-label">风量</span>
-          <FanSpeed
-            value={fanSpeed}
-            onChange={handleFanSpeedChange}
-          />
+      {/* 通风模式 + 手动 + 开机时：自动/手动 切换
+          风量值由半圆 dial 直接交互，不需要下方独立 progress 条 */}
+      {isPoweredOn && isVentMode && fanAdjustable && (
+        <div className="main-panel__mode-toggle-row">
+          <button
+            className={`main-panel__mode-toggle ${fanMode === 'auto' ? 'is-active' : ''}`}
+            onClick={() => handleFanModeChange('auto')}
+            aria-pressed={fanMode === 'auto'}
+          >
+            自动
+          </button>
+          <button
+            className={`main-panel__mode-toggle ${fanMode === 'manual' ? 'is-active' : ''}`}
+            onClick={() => handleFanModeChange('manual')}
+            aria-pressed={fanMode === 'manual'}
+          >
+            手动
+          </button>
         </div>
       )}
 

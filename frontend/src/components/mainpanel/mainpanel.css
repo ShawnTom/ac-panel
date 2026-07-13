@@ -123,9 +123,7 @@
   inset: 0;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding-top: 6px;
-  margin-top: -8px;
+  align-items: center;
   opacity: 1;
   transform: scale(1);
   filter: blur(0);
@@ -140,6 +138,45 @@
   transform: scale(0.92);
   filter: blur(6px);
   pointer-events: none;
+}
+
+/* 通风模式：自动/手动 切换（保留 chip 形态）*/
+.main-panel__mode-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 2px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  margin: 0 auto;
+  width: fit-content;
+}
+
+.main-panel__mode-toggle {
+  width: 80px;
+  height: 30px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.main-panel__mode-toggle:hover {
+  color: var(--accent-primary);
+}
+
+.main-panel__mode-toggle.is-active {
+  background: var(--accent-primary);
+  color: var(--bg-secondary);
+  box-shadow: 0 0 8px var(--accent-glow);
 }
 
 .main-panel__clock {
