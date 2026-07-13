@@ -78,6 +78,19 @@
   letter-spacing: 0.3px;
 }
 
+/* 白天/夜间 时段说明：横排，● 标记当前时段 */
+.global-settings__period-hint {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.75;
+  letter-spacing: 0.3px;
+  padding: 0 2px;
+  margin-top: -4px;
+}
+
 .global-settings__themes {
   display: flex;
   gap: 12px;

@@ -138,10 +138,12 @@ export function GlobalSettingsPanel({
         <div className="global-settings__section-header">
           <span className="global-settings__section-title">亮度</span>
           <p className="global-settings__section-hint">
-            {isNight
-              ? '调节白天亮度将预览 3 秒后自动恢复夜间亮度'
-              : '调节夜间亮度将预览 3 秒后自动恢复白天亮度'}
+            非当前时间段预览 3 秒后自动恢复
           </p>
+        </div>
+        <div className="global-settings__period-hint">
+          <span>白天（8:00-18:00）{isNight ? '' : '●'}</span>
+          <span>晚上（18:00-8:00）{isNight ? '●' : ''}</span>
         </div>
         <div className="global-settings__brightness">
           <div className="global-settings__brightness-row">
