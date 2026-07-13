@@ -19,6 +19,13 @@ type View = 'home' | 'main' | 'room-list' | 'room' | 'settings';
 // 视图顺序：首页(左滑) | 主面板 | 房间列表(右滑) | 房间面板 | 设置
 const viewOrder: View[] = ['home', 'main', 'room-list', 'room', 'settings'];
 
+// 跑马灯对应三个主要可滑动页面
+const marqueeItems: { id: View; label: string }[] = [
+  { id: 'home', label: '首页' },
+  { id: 'main', label: '主控' },
+  { id: 'room-list', label: '房间' },
+];
+
 function App() {
   const [rooms, setRooms] = useState<Room[]>(mockRooms);
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>(mockGlobalSettings);
@@ -148,6 +155,16 @@ function App() {
             onBack={() => setCurrentView('main')}
           />
         </div>
+      </div>
+
+      {/* 顶部跑马灯：三个紧挨的短条暗示首页/主控/房间列表的滚动状态 */}
+      <div className="app__marquee" aria-label="页面导航指示">
+        {marqueeItems.map((item) => (
+          <span
+            key={item.id}
+            className={`app__marquee-bar ${currentView === item.id ? 'is-active' : ''}`}
+          />
+        ))}
       </div>
     </div>
   );

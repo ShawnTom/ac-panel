@@ -71,15 +71,15 @@
   white-space: nowrap;
 }
 
-/* 运行中图标旋转动画 */
+/* 开启后电源键不再旋转，仅保留轻微脉冲提示 */
 .home-panel__power-icon--spin {
-  animation: home-panel-spin 2s linear infinite;
   transform-origin: center;
+  animation: home-panel-pulse 1.6s ease-in-out infinite;
 }
 
-@keyframes home-panel-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes home-panel-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
 }
 
 /* ===== 时间块（左侧）===== */

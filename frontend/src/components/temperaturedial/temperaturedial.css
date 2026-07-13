@@ -5,8 +5,8 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  cursor: grab;
-  touch-action: none;
+  cursor: pointer;
+  touch-action: pan-y;
 }
 
 .temperature-dial:active {
@@ -25,9 +25,32 @@
   filter: drop-shadow(0 0 20px var(--accent-glow));
 }
 
+/* SVG 内的视觉装饰元素：track、progress、ticks、knob 都不消费 pointer 事件，
+   仅 hotzone path 接收温度调节事件；中心数字区域因此天然不会触发温度调节。 */
+.temperature-dial__svg path:not(.temperature-dial__hotzone),
+.temperature-dial__svg line,
+.temperature-dial__svg g,
+.temperature-dial__svg circle {
+  pointer-events: none;
+}
+
+/* 轨道附近的温度调节热区：仅这一层 path 接收 pointer 事件。
+   中心数字区域因 center 容器 pointer-events:none，事件不会被温度旋钮消费，
+   从而直接交给外层面板的 swipe 处理器。 */
+.temperature-dial__hotzone {
+  cursor: grab;
+  pointer-events: stroke;
+  touch-action: none;
+}
+
+.temperature-dial__hotzone:active {
+  cursor: grabbing;
+}
+
 .temperature-dial__knob {
   filter: drop-shadow(0 0 12px var(--accent-glow));
   transition: r 0.15s ease;
+  pointer-events: none;
 }
 
 /* Center display — number + unit inline, horizontally centered,

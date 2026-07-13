@@ -52,3 +52,35 @@ html, body {
   flex-shrink: 0;
   overflow: hidden;
 }
+
+/* ===== 顶部跑马灯：三个紧挨的短条对应首页/主控/房间列表 ===== */
+.app__marquee {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 18px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.app__marquee-bar {
+  display: block;
+  width: 28px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--border-color);
+  opacity: 0.6;
+  transition: background 0.3s ease, opacity 0.3s ease, width 0.3s ease, box-shadow 0.3s ease;
+}
+
+.app__marquee-bar.is-active {
+  background: var(--accent-primary);
+  opacity: 1;
+  width: 40px;
+  box-shadow: 0 0 8px var(--accent-glow);
+}

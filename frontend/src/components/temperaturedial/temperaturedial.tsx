@@ -62,7 +62,7 @@ export function TemperatureDial({
     e.preventDefault();
     e.stopPropagation();
     isDragging.current = true;
-    (e.target as Element).setPointerCapture(e.pointerId);
+    (e.currentTarget as Element).setPointerCapture(e.pointerId);
     const angle = getAngle(e.clientX, e.clientY);
     onChange(angleToTemp(angle));
   }, [disabled, getAngle, angleToTemp, onChange]);
@@ -78,7 +78,7 @@ export function TemperatureDial({
   const handlePointerUp = useCallback((e: React.PointerEvent) => {
     isDragging.current = false;
     try {
-      (e.target as Element).releasePointerCapture(e.pointerId);
+      (e.currentTarget as Element).releasePointerCapture(e.pointerId);
     } catch {
       // ignore
     }
@@ -130,10 +130,6 @@ export function TemperatureDial({
         ref={svgRef}
         className="temperature-dial__svg"
         viewBox="0 0 320 200"
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
       >
         <defs>
           <linearGradient id="dial-progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -200,9 +196,25 @@ export function TemperatureDial({
             </g>
           );
         })()}
+
+        {/* 温度调节热区：透明窄带，仅覆盖轨道附近，
+            中心数字区域不响应温度事件，让外层面板左右滑动手势接管 */}
+        <path
+          d={trackPath}
+          fill="none"
+          stroke="transparent"
+          strokeWidth={32}
+          strokeLinecap="round"
+          className="temperature-dial__hotzone"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+        />
       </svg>
 
-      {/* Center display — number + unit inline, unit baseline-aligned to number */}
+      {/* Center display — number + unit inline, unit baseline-aligned to number.
+          关闭 pointer-events，让中心区域的滑动手势交给外层面板 swipe。 */}
       <div className="temperature-dial__center">
         <span className="temperature-dial__value">{value}</span>
         <span className="temperature-dial__unit">°C</span>
