@@ -93,18 +93,20 @@ export function FanSpeedControl({
 
   return (
     <div
-      className={`fan-speed ${isInactive ? 'fan-speed--inactive' : ''}`}
+      className={`fan-speed ${isInactive ? 'fan-speed--inactive' : ''} ${autoMode ? 'fan-speed--auto' : ''}`}
       data-active-level={safe}
     >
-      {/* 顶部：风 icon + 大档位数字 + 单位 */}
+      {/* 顶部：风 icon 在左，大档位数字在右（左右排列） */}
       <div className="fan-speed__display">
-        <FanIcon level={safe} active={!isInactive} />
-        <div className="fan-speed__readout">
-          <span className="fan-speed__value">{safe}</span>
-          <span className="fan-speed__unit">档</span>
-        </div>
-        <div className="fan-speed__label">
-          {isInactive ? (autoMode ? '自动风量' : '已关闭') : '风量'}
+        <FanIcon level={safe} active={!disabled} autoMode={autoMode} />
+        <div className="fan-speed__readout-col">
+          <div className="fan-speed__readout">
+            <span className="fan-speed__value">{safe}</span>
+            <span className="fan-speed__unit">档</span>
+          </div>
+          <div className="fan-speed__label">
+            {isInactive ? (autoMode ? '自动风量' : '已关闭') : '风量'}
+          </div>
         </div>
       </div>
 
@@ -139,6 +141,7 @@ export function FanSpeedControl({
               key={lvl}
               type="button"
               className={`fan-speed__segment ${lvl <= safe ? 'fan-speed__segment--lit' : ''}`}
+              style={{ ['--seg-idx' as string]: i }}
               onClick={(e) => {
                 e.stopPropagation();
                 setLevel(lvl);
@@ -187,14 +190,16 @@ function PlusIcon() {
 
 /**
  * 旋转风叶 icon：
- * - 档位越高，扇叶越多/越"实"，旋转越快
- * - 自动 / 关闭态时静止、半透明
+ * - 档位越高，扇叶越多/越"实"，手动模式下旋转越快
+ * - 自动模式（autoMode=true）：保持中等固定速度
+ * - 关闭 / 禁用时静止、半透明
  */
-function FanIcon({ level, active }: { level: number; active: boolean }) {
+function FanIcon({ level, active, autoMode = false }: { level: number; active: boolean; autoMode?: boolean }) {
   const l = Math.max(1, Math.min(LEVELS, level));
   // 不同档位扇叶数不同：1=2 叶, 2=3 叶, 3=3 叶, 4=4 叶, 5=4 叶
   const bladeCount = l <= 1 ? 2 : l <= 3 ? 3 : 4;
-  const dur = active ? Math.max(0.4, 1.6 - l * 0.25) : 0;
+  // 自动模式固定速度；手动模式按档位递增转速
+  const dur = !active ? 0 : autoMode ? 1.2 : Math.max(0.4, 1.6 - l * 0.25);
 
   return (
     <div

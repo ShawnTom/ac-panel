@@ -5,7 +5,8 @@
   flex-direction: column;
   align-items: center;
   gap: 18px;
-  padding: 12px 14px 18px;
+  padding: 4px 14px 18px;            /* 顶 padding 收小，让组件整体上移 */
+  margin-top: -16px;                  /* 整体相对 stage 向上抬一点 */
   user-select: none;
   touch-action: none;
 }
@@ -21,13 +22,22 @@
   pointer-events: none;
 }
 
-/* ===== 顶部 display：fan icon + 大数字 ===== */
+/* ===== 顶部 display：fan icon 在左 + 大数字在右（左右排列） ===== */
 .fan-speed__display {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 16px;
   margin-top: 4px;
+}
+
+.fan-speed__readout-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  line-height: 1;
 }
 
 .fan-speed__readout {
@@ -38,13 +48,14 @@
 }
 
 .fan-speed__value {
-  font-size: 64px;
+  font-size: 48px;                   /* 左右排列后，64 → 48 让 icon 和数字视觉平衡 */
   font-weight: 700;
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
   letter-spacing: -1px;
   text-shadow: 0 0 18px var(--accent-glow);
   transition: text-shadow 0.3s ease;
+  line-height: 1;
 }
 
 .fan-speed--inactive .fan-speed__value {
@@ -102,8 +113,8 @@
 
 .fan-speed__step-btn {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1px solid var(--border-color);
   background: var(--bg-card);
@@ -138,11 +149,11 @@
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 4px;
-  height: 56px;
-  padding: 4px;
+  height: 80px;                       /* 整体加高，从 56 → 80 */
+  padding: 6px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: 18px;
   cursor: pointer;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -162,7 +173,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: 2px;
+  gap: 4px;
   padding: 6px 2px 4px;
   border: 0;
   background: transparent;
@@ -189,7 +200,7 @@
 .fan-speed__segment-bar {
   display: block;
   width: 100%;
-  height: 6px;
+  height: 12px;                      /* 能量柱加高：6 → 12 */
   border-radius: 999px;
   background: var(--dial-track);
   transition: background 0.25s ease, box-shadow 0.25s ease, height 0.2s ease;
@@ -224,4 +235,80 @@
 .fan-speed__segment--lit:last-child,
 .fan-speed__segments:hover .fan-speed__segment--lit {
   /* placeholder — 占位避免空规则警告 */
+}
+
+/* ===== 自动模式：固定速度叶片 + 五档循环跑马灯 ===== */
+.fan-speed--auto .fan-icon__rotor {
+  /* 固定中等速度，不受档位影响 */
+  animation-duration: 1.2s !important;
+}
+
+/*
+ * 跑马灯：5 段依次高亮 (1→2→3→4→5→1)，每段亮 1/5 时长。
+ * 总周期 2.5s → 每段 0.5s 高亮。animation-delay 用 --seg-idx 错开。
+ *
+ * 实现：keyframes 用 opacity 在 0~14% 熄灭、15~40% 高亮、41~100% 熄灭。
+ * 第 N 段 delay = N * 0.5s（即总周期的 1/5）。
+ *
+ * 同一动画同时作用在 bar 和 num 上，让段内的"条"和数字一起脉动。
+ */
+.fan-speed--auto .fan-speed__segment {
+  /* 覆盖手动模式基于档位的高亮，自己按 keyframe 走 */
+  color: var(--text-muted);
+}
+
+/* bar 走自己的关键帧：背景色在 dim ↔ gradient 之间切换 */
+.fan-speed--auto .fan-speed__segment-bar {
+  animation: fan-marquee-bar 2.5s linear infinite;
+  animation-delay: calc(var(--seg-idx, 0) * 0.5s);
+  background: var(--dial-track);
+  box-shadow: none;
+}
+
+/* 数字走自己的关键帧：颜色 + 透明度切换 */
+.fan-speed--auto .fan-speed__segment-num {
+  animation: fan-marquee-num 2.5s linear infinite;
+  animation-delay: calc(var(--seg-idx, 0) * 0.5s);
+  opacity: 1;
+}
+
+@keyframes fan-marquee-bar {
+  0%,
+  14% {
+    background: var(--dial-track);
+    box-shadow: none;
+  }
+  15%,
+  40% {
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
+  41%,
+  100% {
+    background: var(--dial-track);
+    box-shadow: none;
+  }
+}
+
+@keyframes fan-marquee-num {
+  0%,
+  14% {
+    opacity: 0.55;
+    color: var(--text-muted);
+  }
+  15%,
+  40% {
+    opacity: 1;
+    color: var(--accent-primary);
+  }
+  41%,
+  100% {
+    opacity: 0.55;
+    color: var(--text-muted);
+  }
+}
+
+/* 自动模式下让 "lit" 状态由 keyframe 接管，去掉手动模式的 lit 颜色 */
+.fan-speed--auto .fan-speed__segment--lit {
+  color: inherit;
 }
