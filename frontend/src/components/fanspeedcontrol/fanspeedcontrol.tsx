@@ -136,7 +136,7 @@ export function FanSpeedControl({
             <button
               key={lvl}
               type="button"
-              className={`fan-speed__segment ${lvl <= safe ? 'fan-speed__segment--lit' : ''}`}
+              className={`fan-speed__segment ${autoMode || lvl <= safe ? 'fan-speed__segment--lit' : ''}`}
               onClick={(e) => {
                 e.stopPropagation();
                 setLevel(lvl);

@@ -237,36 +237,37 @@
  * 自动模式：5 段"充电"效果跑马灯（纯 CSS 实现，无 inline style）
  * - 用 :nth-child 选择器分别设置 animation-delay
  * - 用 box-shadow + background 透明度脉冲，避开 transform: scaleY(0) 黑屏风险
- * - 总周期 2.5s，每段延迟 0.5s（段1先亮，段5最后亮）
+ * - 总周期 2.5s，每段延迟 0.5s（段1先亮，段5最后亮），然后 0~5 循环
+ * - 自动模式下忽略手动档位限制：所有 5 段都参与跑马灯
  * - 整体保持 disabled（pointer-events 由 .fan-speed--inactive 处理）
  * ===================================================== */
-.fan-speed--auto .fan-speed__segment--lit .fan-speed__segment-bar {
+.fan-speed--auto .fan-speed__segment .fan-speed__segment-bar {
   animation: fan-charge-pulse 2.5s linear infinite;
 }
 
-.fan-speed--auto .fan-speed__segment--lit .fan-speed__segment-num {
+.fan-speed--auto .fan-speed__segment .fan-speed__segment-num {
   animation: fan-charge-pulse-color 2.5s linear infinite;
 }
 
 /* 5 段依次亮起：nth-child 1 最先，nth-child 5 最后 */
-.fan-speed--auto .fan-speed__segment:nth-child(1).fan-speed__segment--lit .fan-speed__segment-bar,
-.fan-speed--auto .fan-speed__segment:nth-child(1).fan-speed__segment--lit .fan-speed__segment-num {
+.fan-speed--auto .fan-speed__segment:nth-child(1) .fan-speed__segment-bar,
+.fan-speed--auto .fan-speed__segment:nth-child(1) .fan-speed__segment-num {
   animation-delay: 0s;
 }
-.fan-speed--auto .fan-speed__segment:nth-child(2).fan-speed__segment--lit .fan-speed__segment-bar,
-.fan-speed--auto .fan-speed__segment:nth-child(2).fan-speed__segment--lit .fan-speed__segment-num {
+.fan-speed--auto .fan-speed__segment:nth-child(2) .fan-speed__segment-bar,
+.fan-speed--auto .fan-speed__segment:nth-child(2) .fan-speed__segment-num {
   animation-delay: 0.5s;
 }
-.fan-speed--auto .fan-speed__segment:nth-child(3).fan-speed__segment--lit .fan-speed__segment-bar,
-.fan-speed--auto .fan-speed__segment:nth-child(3).fan-speed__segment--lit .fan-speed__segment-num {
+.fan-speed--auto .fan-speed__segment:nth-child(3) .fan-speed__segment-bar,
+.fan-speed--auto .fan-speed__segment:nth-child(3) .fan-speed__segment-num {
   animation-delay: 1s;
 }
-.fan-speed--auto .fan-speed__segment:nth-child(4).fan-speed__segment--lit .fan-speed__segment-bar,
-.fan-speed--auto .fan-speed__segment:nth-child(4).fan-speed__segment--lit .fan-speed__segment-num {
+.fan-speed--auto .fan-speed__segment:nth-child(4) .fan-speed__segment-bar,
+.fan-speed--auto .fan-speed__segment:nth-child(4) .fan-speed__segment-num {
   animation-delay: 1.5s;
 }
-.fan-speed--auto .fan-speed__segment:nth-child(5).fan-speed__segment--lit .fan-speed__segment-bar,
-.fan-speed--auto .fan-speed__segment:nth-child(5).fan-speed__segment--lit .fan-speed__segment-num {
+.fan-speed--auto .fan-speed__segment:nth-child(5) .fan-speed__segment-bar,
+.fan-speed--auto .fan-speed__segment:nth-child(5) .fan-speed__segment-num {
   animation-delay: 2s;
 }
 
