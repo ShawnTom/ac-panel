@@ -141,14 +141,10 @@ export function GlobalSettingsPanel({
             非当前时间段预览 3 秒后自动恢复
           </p>
         </div>
-        <div className="global-settings__period-hint">
-          <span>白天（8:00-18:00）{isNight ? '' : '●'}</span>
-          <span>晚上（18:00-8:00）{isNight ? '●' : ''}</span>
-        </div>
         <div className="global-settings__brightness">
           <div className="global-settings__brightness-row">
             <span className="global-settings__brightness-label">
-              白天 {isNight ? '' : '●'}
+              白天（8:00-18:00）{isNight ? '' : '●'}
             </span>
             <input
               type="range"
@@ -162,7 +158,7 @@ export function GlobalSettingsPanel({
           </div>
           <div className="global-settings__brightness-row">
             <span className="global-settings__brightness-label">
-              夜间 {isNight ? '●' : ''}
+              晚上（18:00-8:00）{isNight ? '●' : ''}
             </span>
             <input
               type="range"
