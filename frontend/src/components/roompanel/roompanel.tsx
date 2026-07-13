@@ -117,17 +117,17 @@ export function RoomPanel({
         {toast.message}
       </div>
 
-      {/* Header */}
+      {/* Header：返回按钮在最左边，房间名 + 时间 居右侧 */}
       <div className="main-panel__header">
+        <button className="room-panel__back-btn" onClick={onBack} aria-label="Back">
+          <BackArrowIcon />
+        </button>
         <div className="main-panel__room-info">
           <span className="main-panel__room-name">{room.name}</span>
           <span className={`main-panel__time ${!isPoweredOn ? 'main-panel__time--dim' : ''}`}>
             {currentTime}
           </span>
         </div>
-        <button className="room-panel__back-btn" onClick={onBack} aria-label="Back">
-          <BackArrowIcon />
-        </button>
       </div>
 
       {/* Center stage */}

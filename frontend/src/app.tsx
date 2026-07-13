@@ -157,15 +157,18 @@ function App() {
         </div>
       </div>
 
-      {/* 顶部跑马灯：三个紧挨的短条暗示首页/主控/房间列表的滚动状态 */}
-      <div className="app__marquee" aria-label="页面导航指示">
-        {marqueeItems.map((item) => (
-          <span
-            key={item.id}
-            className={`app__marquee-bar ${currentView === item.id ? 'is-active' : ''}`}
-          />
-        ))}
-      </div>
+      {/* 顶部跑马灯：三个紧挨的短条暗示首页/主控/房间列表的滚动状态
+          房间详情页（currentView === 'room'）不显示，避免和房间自己的返回按钮视觉冲突 */}
+      {currentView !== 'room' && (
+        <div className="app__marquee" aria-label="页面导航指示">
+          {marqueeItems.map((item) => (
+            <span
+              key={item.id}
+              className={`app__marquee-bar ${currentView === item.id ? 'is-active' : ''}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
