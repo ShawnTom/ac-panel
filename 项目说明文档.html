@@ -65,12 +65,13 @@ li { margin-bottom:4px; }
 <tr><td>空调模式切换（制冷/制热/通风）</td><td><span class="badge badge-green">可操作</span></td><td><span class="badge badge-orange">仅展示</span></td><td>—</td><td>—</td></tr>
 <tr><td>温度调节（半圆旋钮，16–30°C）</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td>—</td><td>—</td></tr>
 <tr><td>风量调节（5 档 + 自动/手动）</td><td><span class="badge badge-green">通风模式</span></td><td><span class="badge badge-green">通风模式</span></td><td>—</td><td>—</td></tr>
-<tr><td>房间电源开关</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">一键启停</span></td><td>—</td></tr>
+<tr><td>房间电源开关</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">一键启停（底部居中）</span></td><td>—</td></tr>
 <tr><td>主题切换（黑金/灰白/蓝紫）</td><td>—</td><td>—</td><td>—</td><td><span class="badge badge-green">✓</span></td></tr>
 <tr><td>亮度调节（白天 8:00-18:00 / 晚上 18:00-8:00）</td><td>—</td><td>—</td><td>—</td><td><span class="badge badge-green">跨时段 3 秒预览</span></td></tr>
 <tr><td>室内环境监测</td><td>—</td><td>—</td><td><span class="badge badge-green">温/湿/PM2.5/CO2/VOC</span></td><td>—</td></tr>
 <tr><td>总控电源校验</td><td>—</td><td colspan="3"><span class="badge badge-orange">总控关闭 → 单独开房间 toast 拦截</span></td></tr>
 <tr><td>滑动导航</td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-green">✓</span></td><td><span class="badge badge-red">禁用</span></td></tr>
+<tr><td>覆盖层（150ms opacity 渐变）</td><td>—</td><td><span class="badge badge-green">房间详情</span></td><td>—</td><td><span class="badge badge-green">全局设置</span></td></tr>
 </table>
 
 <h2>二、技术栈</h2>
@@ -149,13 +150,15 @@ li { margin-bottom:4px; }
 
 <h3>视图架构</h3>
 <div class="card">
-<p>采用 <strong>track + translateX</strong> 滑动架构，5 个视图横向排列：</p>
-<p><code>首页 → 总控面板 → 房间列表 → 房间面板 → 设置页</code></p>
+<p>采用 <strong>横向 track + 覆盖层</strong> 混合架构：</p>
+<p>横向 track（左/右滑动）：<code>首页 → 总控面板 → 房间列表</code></p>
+<p>覆盖层（直接替换 + 150ms opacity 渐变）：房间详情 / 全局设置</p>
 <ul>
-<li>左滑前进，右滑后退</li>
-<li>所有视图同时渲染，CSS transform 控制位置</li>
-<li>设置页禁用滑动手势（<code>onSwipeLeft</code> / <code>onSwipeRight</code> 传 <code>undefined</code>）</li>
-<li>房间详情页和设置页不显示顶部跑马灯</li>
+<li>3 个横向视图同时渲染在 <code>app__track</code>（300% 宽）容器中，通过 <code>translateX</code> 控制位置</li>
+<li>每个视图占 33.3334% 宽度</li>
+<li>房间详情 + 全局设置作为独立覆盖层（<code>.app__overlay</code>）：<code>position: absolute; inset: 0</code>，<code>opacity: 0 → 1</code> 渐变 150ms（无位移）</li>
+<li>覆盖层打开时 <code>onSwipeLeft</code> / <code>onSwipeRight</code> 传 <code>undefined</code>，自动禁用横向滑动</li>
+<li>房间详情页和设置页不显示顶部跑马灯（由覆盖层自然遮挡）</li>
 </ul>
 </div>
 
@@ -196,21 +199,22 @@ li { margin-bottom:4px; }
 <h2>六、交互说明</h2>
 
 <h3>滑动导航</h3>
+<p>横向 track 视图（3 个）：</p>
 <table>
 <tr><th>当前页面</th><th>左滑</th><th>右滑</th></tr>
 <tr><td>首页</td><td>→ 总控面板</td><td>—</td></tr>
 <tr><td>总控面板</td><td>→ 房间列表</td><td>→ 首页</td></tr>
 <tr><td>房间列表</td><td>—</td><td>→ 总控面板</td></tr>
-<tr><td>房间面板</td><td>—</td><td>→ 房间列表</td></tr>
-<tr><td>设置页</td><td><span class="badge badge-red">禁用</span></td><td><span class="badge badge-red">禁用</span></td></tr>
 </table>
+<p>覆盖层（房间详情 / 全局设置）：<span class="badge badge-red">禁用任何滑动手势</span>，只允许用页面内返回按钮退出。</p>
 
 <h3>一键启动/关闭</h3>
 <div class="card">
-<p>首页右上角按钮，点击后同步所有房间的电源状态 + 总控：</p>
+<p>首页最下方按钮（底部居中），点击后同步所有房间的电源状态 + 总控：</p>
 <ul>
 <li><strong>关机时</strong>：显示"一键启动"</li>
 <li><strong>开机时</strong>：显示"一键关闭"（反色填充，图标旋转）</li>
+<li>右上角改为全局设置按钮（无外圆边框，与房间列表/主页一致）</li>
 </ul>
 </div>
 
@@ -301,6 +305,9 @@ npm run preview    # 预览构建结果</code></pre>
 <li>✅ 房间详情页 + 设置页隐藏顶部跑马灯</li>
 <li>✅ 设置页禁用滑动手势（<code>onSwipeLeft</code> / <code>onSwipeRight</code> 传 <code>undefined</code>）</li>
 <li>✅ 充电动画从 inline style + transform 改为纯 CSS <code>:nth-child()</code> + box-shadow 动画（修复黑屏问题）</li>
+<li>✅ <strong>视图架构重构</strong>：横向 track 只承载 3 个视图（首页/主控/房间列表）；房间详情 + 全局设置改为<strong>覆盖层</strong>（直接替换 + 150ms opacity 渐变，无位移）</li>
+<li>✅ 主页改版：一键启动按钮移到页面最下方（底部居中），右上角改为全局设置按钮</li>
+<li>✅ 房间列表微调：主页 icon 下移 2px（<code>transform: translateY(2px)</code>），房间卡片网格下移 8px（<code>margin-top: 8px</code>）</li>
 </ul>
 </div>
 

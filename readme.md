@@ -19,8 +19,9 @@
 | 主题切换（黑金/灰白/蓝紫） | — | — | — | ✅ |
 | 亮度调节（白天 8:00-18:00 / 晚上 18:00-8:00，跨时段 3 秒预览） | — | — | — | ✅ |
 | 室内环境监测（温度/湿度/PM2.5/CO2/VOC） | — | — | ✅ | — |
-| 总控开关校验（关闭后单独开房间 → toast 提示） | — | ✅ | — | — |
+| 总控电源校验（关闭后单独开房间 → toast 提示） | — | ✅ | — | — |
 | 滑动导航 | ✅ | ✅ | ✅ | ❌（禁用滑动手势） |
+| 覆盖层（150ms opacity 渐变） | — | ✅ | — | ✅ |
 
 ---
 
@@ -63,10 +64,10 @@ ac-panel/
 │   │   │   ├── tech-blue-purple.css  # 科技蓝紫主题
 │   │   │   ├── black-gold.css        # 尊贵黑金主题
 │   │   │   └── gray-white.css        # 极简灰白主题
-│   │   ├── types/index.ts         # TypeScript 类型定义
-│   │   ├── mock/data.ts           # Mock 数据
-│   │   ├── app.tsx                # 根组件（视图路由 + 状态管理）
-│   │   ├── app.css                # 全局样式
+│   │   ├── types/index.ts         # TypeScript 类型定义（含 FanMode / fanSpeed）
+│   │   ├── mock/data.ts           # Mock 数据（含风量字段）
+│   │   ├── app.tsx                # 根组件（视图路由 + 总控校验 + 覆盖层）
+│   │   ├── app.css                # 全局样式（track + overlay）
 │   │   └── main.tsx               # 入口
 │   ├── index.html
 │   ├── vite.config.ts
@@ -96,18 +97,20 @@ ac-panel/
 
 ### 4.1 视图架构
 
-系统采用 **track + translateX** 滑动架构，5 个视图横向排列，通过 `translateX` 偏移实现平滑滑动切换：
+系统采用 **横向 track + 覆盖层** 混合架构：
 
 ```
-视图顺序：首页 → 总控面板 → 房间列表 → 房间面板 → 设置页
-滑动方向：左滑前进，右滑后退
+横向 track（左/右滑动）：首页 → 总控面板 → 房间列表
+覆盖层（直接替换 + 150ms opacity 渐变）：房间详情 / 全局设置
 ```
 
 - `app.tsx` 作为唯一状态源，管理 `rooms`（房间数组）和 `globalSettings`（全局设置）
-- 所有视图同时渲染在 `app__view` 容器中，通过 CSS `transform` 控制位置
-- `useSwipe` 检测滑动手势，左滑/右滑触发视图切换
+- 3 个横向视图同时渲染在 `app__track`（300% 宽）容器中，通过 `translateX` 控制位置（每个视图占 33.3334%）
+- `useSwipe` 检测左/右滑手势切换横向视图
+- 房间详情 + 全局设置作为**独立覆盖层**（`.app__overlay`）渲染：`position: absolute; inset: 0`，`opacity: 0 → 1` 渐变 150ms（无位移）
+- 覆盖层打开时（`overlayView !== null`），`useSwipe` 的 `onSwipeLeft` / `onSwipeRight` 都传 `undefined`，自动禁用横向滑动
 
-> **注意**：设置页（`currentView === 'settings'`）禁用任何滑动手势（`onSwipeLeft` / `onSwipeRight` 均传 `undefined`），只允许用页面内返回按钮退出。同时房间详情页和设置页都不显示顶部跑马灯（避免视觉冲突）。
+> **注意**：房间详情页和设置页都不显示顶部跑马灯（避免视觉冲突），由覆盖层自然遮挡。
 
 ### 4.2 核心组件
 
@@ -268,13 +271,15 @@ export interface GlobalSettings {
 
 ### 6.1 滑动导航
 
+横向 track 视图（3 个）：
+
 | 当前页面 | 左滑（手指右→左） | 右滑（手指左→右） |
 |---------|:-:|:-:|
 | 首页 | → 总控面板 | — |
 | 总控面板 | → 房间列表 | → 首页 |
 | 房间列表 | — | → 总控面板 |
-| 房间面板 | — | → 房间列表 |
-| 设置页 | ❌ 禁用 | ❌ 禁用（只能用返回按钮退出） |
+
+覆盖层（房间详情 / 全局设置）：禁用任何滑动手势，只允许用页面内返回按钮退出。
 
 ### 6.2 一键启动/关闭
 
@@ -397,8 +402,8 @@ npm run preview    # 预览构建结果
 
 | 文件 | 说明 |
 |------|------|
-| `src/app.tsx` | 根组件，视图路由 + 全局状态管理 + 总控电源校验 + 顶层 toast |
-| `src/app.css` | 全局样式，track 滑动容器 |
+| `src/app.tsx` | 根组件，横向 track（3 view）+ 覆盖层（room/settings）+ 总控电源校验 + 顶层 toast |
+| `src/app.css` | 全局样式，track 横向滑动 + overlay 渐入覆盖 |
 | `src/main.tsx` | React 渲染入口 |
 | `src/types/index.ts` | TypeScript 类型定义（含 FanMode / fanSpeed 等） |
 | `src/mock/data.ts` | 6 个房间 + 全局设置 Mock 数据（含风量字段） |
@@ -446,3 +451,6 @@ npm run preview    # 预览构建结果
 - ✅ 房间详情页 + 设置页隐藏顶部跑马灯
 - ✅ 设置页禁用滑动手势（`onSwipeLeft` / `onSwipeRight` 传 `undefined`）
 - ✅ 充电动画从 inline style + transform 改为纯 CSS `:nth-child()` + box-shadow 动画（修复黑屏问题）
+- ✅ **视图架构重构**：横向 track 只承载 3 个视图（首页/主控/房间列表）；房间详情 + 全局设置改为**覆盖层**（直接替换 + 150ms opacity 渐变，无位移）
+- ✅ 主页改版：一键启动按钮移到页面最下方（底部居中），右上角改为全局设置按钮
+- ✅ 房间列表微调：主页 icon 下移 2px（`transform: translateY(2px)`），房间卡片网格下移 8px（`margin-top: 8px`）

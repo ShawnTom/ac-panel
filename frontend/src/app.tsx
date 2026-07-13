@@ -35,10 +35,10 @@ function App() {
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>(mockGlobalSettings);
   // 横向视图：首页 | 主控 | 房间列表（左右滑动切换）
   const [horizontalView, setHorizontalView] = useState<HorizontalView>('main');
-  // 覆盖层视图：room | settings（从上方滑入覆盖）
+  // 覆盖层视图：room | settings（直接替换 + 150ms opacity 渐变）
   const [overlayView, setOverlayView] = useState<OverlayView | null>(null);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
-  // 离开覆盖层时的动画方向：'enter' = 从上滑入，'exit' = 向上滑出
+  // 覆盖层进入/退出状态：'enter' = 渐入完成，'exit' = 渐出
   const [overlayState, setOverlayState] = useState<'enter' | 'exit' | null>(null);
   const prevHorizontalViewRef = useRef<HorizontalView>('main');
 
@@ -60,12 +60,12 @@ function App() {
     setTheme(globalSettings.theme);
   }, [globalSettings.theme, setTheme]);
 
-  // 覆盖层进入/退出动画：进入先 exit=false + 0 → 0.5ms 后改为 enter（用 mount 然后 transition 到 0）
-  // 这里用简单的两阶段：先 hidden（transform: translateY(-100%)）然后 mounted 后下一帧改成 translateY(0)
+  // 覆盖层进入/退出：进入时先挂载到 opacity:0（'exit'），
+  // 下一帧切到 opacity:1（'enter'），由 CSS transition 完成 150ms 渐入
   useEffect(() => {
     if (overlayView) {
-      setOverlayState('exit'); // 初始位置：屏幕上方
-      // 下一帧切到 enter：触发滑入动画
+      setOverlayState('exit');
+      // 下一帧切到 enter：触发渐入动画
       const id = requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setOverlayState('enter');
@@ -196,7 +196,7 @@ function App() {
 
   return (
     <div className="app" {...swipeHandlers}>
-      {/* 横向 track：首页 | 主控 | 房间列表 */}
+      {/* 横向 track：首页 | 主控 | 房间列表（左右滑动切换） */}
       <div
         className="app__track"
         style={{ transform: `translateX(-${horizontalIndex * (100 / 3)}%)` }}
@@ -225,7 +225,7 @@ function App() {
         </div>
       </div>
 
-      {/* 纵向覆盖层：room | settings（从上方滑入） */}
+      {/* 覆盖层：room | settings（直接替换 + 150ms opacity 渐变） */}
       {overlayView === 'room' && selectedRoom && (
         <div className={`app__overlay app__overlay--${overlayState ?? 'enter'}`}>
           <RoomPanel
