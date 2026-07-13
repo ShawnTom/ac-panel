@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Room, GlobalSettings, ACMode } from './types';
 import { mockRooms, mockGlobalSettings } from './mock/data';
 import { useTheme } from './hooks/usetheme';
@@ -17,12 +17,14 @@ import './themes/black-gold.css';
 import './themes/gray-white.css';
 
 type View = 'home' | 'main' | 'room-list' | 'room' | 'settings';
+type HorizontalView = 'home' | 'main' | 'room-list';
+type OverlayView = 'room' | 'settings';
 
-// 视图顺序：首页(左滑) | 主面板 | 房间列表(右滑) | 房间面板 | 设置
-const viewOrder: View[] = ['home', 'main', 'room-list', 'room', 'settings'];
+// 横向滑动视图顺序：首页 | 主控 | 房间列表
+const horizontalOrder: HorizontalView[] = ['home', 'main', 'room-list'];
 
 // 跑马灯对应三个主要可滑动页面
-const marqueeItems: { id: View; label: string }[] = [
+const marqueeItems: { id: HorizontalView; label: string }[] = [
   { id: 'home', label: '首页' },
   { id: 'main', label: '主控' },
   { id: 'room-list', label: '房间' },
@@ -31,8 +33,14 @@ const marqueeItems: { id: View; label: string }[] = [
 function App() {
   const [rooms, setRooms] = useState<Room[]>(mockRooms);
   const [globalSettings, setGlobalSettings] = useState<GlobalSettings>(mockGlobalSettings);
-  const [currentView, setCurrentView] = useState<View>('main');
+  // 横向视图：首页 | 主控 | 房间列表（左右滑动切换）
+  const [horizontalView, setHorizontalView] = useState<HorizontalView>('main');
+  // 覆盖层视图：room | settings（从上方滑入覆盖）
+  const [overlayView, setOverlayView] = useState<OverlayView | null>(null);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  // 离开覆盖层时的动画方向：'enter' = 从上滑入，'exit' = 向上滑出
+  const [overlayState, setOverlayState] = useState<'enter' | 'exit' | null>(null);
+  const prevHorizontalViewRef = useRef<HorizontalView>('main');
 
   const { setTheme } = useTheme(globalSettings.theme);
   const {
@@ -44,7 +52,7 @@ function App() {
     previewCountdown,
     previewValue,
   } = useBrightness(globalSettings.brightness);
-  // 顶层 toast：用于跨页面的提示（如总控关闭时单独开房间的提示）
+  // 顶层 toast：用于跨页面提示（如总控关闭时单独开房间的提示）
   const { toast, showToast } = useToast();
 
   // 主题切换
@@ -52,32 +60,43 @@ function App() {
     setTheme(globalSettings.theme);
   }, [globalSettings.theme, setTheme]);
 
-  // 滑动导航：
-  // 左滑(手指右→左) = 前进到右侧屏
-  // 右滑(手指左→右) = 回退到左侧屏
-  // 设置页禁用任何滑动手势：只允许用返回按钮退出
+  // 覆盖层进入/退出动画：进入先 exit=false + 0 → 0.5ms 后改为 enter（用 mount 然后 transition 到 0）
+  // 这里用简单的两阶段：先 hidden（transform: translateY(-100%)）然后 mounted 后下一帧改成 translateY(0)
+  useEffect(() => {
+    if (overlayView) {
+      setOverlayState('exit'); // 初始位置：屏幕上方
+      // 下一帧切到 enter：触发滑入动画
+      const id = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setOverlayState('enter');
+        });
+      });
+      return () => cancelAnimationFrame(id);
+    } else {
+      setOverlayState(null);
+    }
+  }, [overlayView]);
+
+  // 横向滑动：仅在没有覆盖层时生效
   const swipeHandlers = useSwipe({
-    onSwipeLeft: currentView === 'settings' ? undefined : () => {
+    onSwipeLeft: overlayView ? undefined : () => {
       // 前进
-      if (currentView === 'home') setCurrentView('main');
-      else if (currentView === 'main') setCurrentView('room-list');
-      // room-list → room 需要已选中房间，不自动跳转
+      if (horizontalView === 'home') setHorizontalView('main');
+      else if (horizontalView === 'main') setHorizontalView('room-list');
+      // room-list → room 需要已选中房间，不自动滑动切换
     },
-    onSwipeRight: currentView === 'settings' ? undefined : () => {
+    onSwipeRight: overlayView ? undefined : () => {
       // 回退
-      if (currentView === 'main') setCurrentView('home');
-      else if (currentView === 'room-list') setCurrentView('main');
-      else if (currentView === 'room') {
-        setSelectedRoomId(null);
-        setCurrentView('room-list');
-      }
+      if (horizontalView === 'main') setHorizontalView('home');
+      else if (horizontalView === 'room-list') setHorizontalView('main');
       // settings 走返回按钮（swipe 已禁用）
     },
   });
 
   const handleRoomSelect = (roomId: string) => {
     setSelectedRoomId(roomId);
-    setCurrentView('room');
+    prevHorizontalViewRef.current = horizontalView;
+    setOverlayView('room');
   };
 
   const handleRoomUpdate = (updatedRoom: Room) => {
@@ -150,57 +169,79 @@ function App() {
     }
   };
 
+  /** 打开覆盖层（room / settings） */
+  const openOverlay = (view: OverlayView) => {
+    prevHorizontalViewRef.current = horizontalView;
+    setOverlayView(view);
+  };
+
+  /** 关闭覆盖层：触发滑出动画后卸载 */
+  const closeOverlay = () => {
+    if (!overlayView) return;
+    setOverlayState('exit');
+    // 等动画结束后再卸载
+    setTimeout(() => {
+      if (overlayView === 'room') {
+        setSelectedRoomId(null);
+      }
+      setOverlayView(null);
+      setOverlayState(null);
+    }, 320); // 与 CSS transition 时长保持一致
+  };
+
   const selectedRoom = rooms.find(r => r.id === selectedRoomId) || null;
   const mainRoom = rooms.find(r => r.id === 'living-room') || rooms[0];
 
-  const currentIndex = viewOrder.indexOf(currentView);
+  const horizontalIndex = horizontalOrder.indexOf(horizontalView);
 
   return (
     <div className="app" {...swipeHandlers}>
+      {/* 横向 track：首页 | 主控 | 房间列表 */}
       <div
         className="app__track"
-        style={{ transform: `translateX(-${currentIndex * 20}%)` }}
+        style={{ transform: `translateX(-${horizontalIndex * (100 / 3)}%)` }}
       >
-        <div className="app__view">
-          <HomePanel rooms={rooms} settings={globalSettings} onPowerToggle={handlePowerToggle} onSettingsClick={() => setCurrentView('settings')} />
+        <div className="app__view app__view--horizontal">
+          <HomePanel rooms={rooms} settings={globalSettings} onPowerToggle={handlePowerToggle} onSettingsClick={() => openOverlay('settings')} />
         </div>
-        <div className="app__view">
+        <div className="app__view app__view--horizontal">
           <MainPanel
             room={mainRoom}
             settings={globalSettings}
             onModeChange={handleModeChange}
             onPowerToggle={handlePowerToggle}
-            onSettingsClick={() => setCurrentView('settings')}
+            onSettingsClick={() => openOverlay('settings')}
             onRoomUpdate={handleRoomUpdate}
           />
         </div>
-        <div className="app__view">
+        <div className="app__view app__view--horizontal">
           <RoomList
             rooms={rooms}
             onRoomSelect={handleRoomSelect}
             onRoomPowerToggle={handleRoomPowerToggleWithGuard}
-            onBack={() => setCurrentView('main')}
-            onSettingsClick={() => setCurrentView('settings')}
+            onBack={() => setHorizontalView('main')}
+            onSettingsClick={() => openOverlay('settings')}
           />
         </div>
-        <div className="app__view">
-          {selectedRoom && (
-            <RoomPanel
-              room={selectedRoom}
-              settings={globalSettings}
-              globalPower={globalSettings.power}
-              modeDisabled
-              onBack={() => {
-                setSelectedRoomId(null);
-                setCurrentView('room-list');
-              }}
-              onModeChange={handleModeChange}
-              onPowerToggle={() => handleRoomPanelPowerToggle(selectedRoom)}
-              onRoomUpdate={handleRoomUpdate}
-            />
-          )}
+      </div>
+
+      {/* 纵向覆盖层：room | settings（从上方滑入） */}
+      {overlayView === 'room' && selectedRoom && (
+        <div className={`app__overlay app__overlay--${overlayState ?? 'enter'}`}>
+          <RoomPanel
+            room={selectedRoom}
+            settings={globalSettings}
+            globalPower={globalSettings.power}
+            modeDisabled
+            onBack={closeOverlay}
+            onModeChange={handleModeChange}
+            onPowerToggle={() => handleRoomPanelPowerToggle(selectedRoom)}
+            onRoomUpdate={handleRoomUpdate}
+          />
         </div>
-        <div className="app__view">
+      )}
+      {overlayView === 'settings' && (
+        <div className={`app__overlay app__overlay--${overlayState ?? 'enter'}`}>
           <GlobalSettingsPanel
             settings={globalSettings}
             brightnessConfig={brightnessConfig}
@@ -210,19 +251,19 @@ function App() {
             onBrightnessPreview={previewBrightness}
             previewValue={previewValue}
             previewCountdown={previewCountdown}
-            onBack={() => setCurrentView('main')}
+            onBack={closeOverlay}
           />
         </div>
-      </div>
+      )}
 
       {/* 顶部跑马灯：三个紧挨的短条暗示首页/主控/房间列表的滚动状态
           房间详情页 / 设置页 不显示（房间有自带返回按钮；设置页独立） */}
-      {currentView !== 'room' && currentView !== 'settings' && (
+      {!overlayView && (
         <div className="app__marquee" aria-label="页面导航指示">
           {marqueeItems.map((item) => (
             <span
               key={item.id}
-              className={`app__marquee-bar ${currentView === item.id ? 'is-active' : ''}`}
+              className={`app__marquee-bar ${horizontalView === item.id ? 'is-active' : ''}`}
             />
           ))}
         </div>
