@@ -16,8 +16,8 @@ interface BrightnessConfig {
  *
  * 跨时段调节：
  * - 白天调夜间/夜间调白天滑块时，临时应用 3 秒预览
- * - 预览期间通过 previewValue 暴露给上层做 toast 倒计时
- * - 3 秒后自动恢复当前时段配置的亮度
+ * - 预览期间通过 previewValue / previewCountdown 暴露给上层做 toast 倒计时
+ * - 3 秒后自动恢复当前时段配置的亮度（用 ref 锁住最新值，不依赖 useEffect 时序）
  */
 const MIN_DAY = 50;
 const MIN_NIGHT = 30;
@@ -36,8 +36,14 @@ export function useBrightness(config: BrightnessConfig) {
   });
   // 预览值：非 null 时说明正在预览中（用于上层 toast 倒计时）
   const [previewValue, setPreviewValue] = useState<number | null>(null);
-  const previewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [countdown, setCountdown] = useState(0);
+  const previewTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 用 ref 锁住最新的 isNight / brightnessConfig，避免 effect 时序问题
+  const isNightRef = useRef(isNight);
+  const configRef = useRef(brightnessConfig);
+  useEffect(() => { isNightRef.current = isNight; }, [isNight]);
+  useEffect(() => { configRef.current = brightnessConfig; }, [brightnessConfig]);
 
   useEffect(() => {
     const checkTime = () => {
@@ -47,16 +53,6 @@ export function useBrightness(config: BrightnessConfig) {
     checkTime();
     const interval = setInterval(checkTime, 60000);
     return () => clearInterval(interval);
-  }, []);
-
-  // 取消预览：清除 timer + 重置状态
-  const cancelPreview = useCallback(() => {
-    if (previewTimerRef.current) {
-      clearTimeout(previewTimerRef.current);
-      previewTimerRef.current = null;
-    }
-    setPreviewValue(null);
-    setCountdown(0);
   }, []);
 
   // 把用户给定的值钳到合理范围并按最低映射
@@ -69,22 +65,27 @@ export function useBrightness(config: BrightnessConfig) {
     root.style.transition = 'filter 0.5s ease';
   }, []);
 
-  // 应用当前时段配置的亮度（非预览）
+  // 应用当前时段配置的亮度（不进入预览态）
   const applyCurrent = useCallback(() => {
-    const value = isNight ? brightnessConfig.night : brightnessConfig.day;
-    applyValue(value);
-  }, [isNight, brightnessConfig, applyValue]);
+    const current = isNightRef.current ? configRef.current.night : configRef.current.day;
+    applyValue(current);
+  }, [applyValue]);
 
-  // 当 isNight 或 brightnessConfig 变化时，如果不是预览态就应用
-  useEffect(() => {
-    if (previewValue === null) {
-      applyCurrent();
+  // 取消预览：清除 timer + 重置状态 + 立即恢复当前时段真实亮度
+  const cancelPreview = useCallback(() => {
+    if (previewTimerRef.current) {
+      clearTimeout(previewTimerRef.current);
+      previewTimerRef.current = null;
     }
-  }, [applyCurrent, previewValue]);
+    setPreviewValue(null);
+    setCountdown(0);
+    // 显式立刻恢复当前时段的真实亮度，不依赖 useEffect
+    applyCurrent();
+  }, [applyCurrent]);
 
   // 预览一个亮度值（跨时段滑块调节时调用）
   const previewBrightness = useCallback((value: number) => {
-    cancelPreview();
+    if (previewTimerRef.current) clearTimeout(previewTimerRef.current);
     setPreviewValue(value);
     setCountdown(Math.ceil(PREVIEW_DURATION_MS / 1000));
     applyValue(value);
@@ -101,6 +102,13 @@ export function useBrightness(config: BrightnessConfig) {
     }, 1000);
     return () => clearInterval(tick);
   }, [previewValue]);
+
+  // 当 isNight 或 brightnessConfig 变化时（且未在预览）应用当前时段
+  useEffect(() => {
+    if (previewValue === null) {
+      applyCurrent();
+    }
+  }, [isNight, brightnessConfig, previewValue, applyCurrent]);
 
   // 卸载时清理
   useEffect(() => {

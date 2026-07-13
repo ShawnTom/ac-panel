@@ -48,6 +48,18 @@ export function GlobalSettingsPanel({
   // 全局 toast（用于跨时段预览倒计时）
   const [globalToast, setGlobalToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
 
+  // 跨时段滑块的本地"虚拟"值：让滑块 UI 不回弹，但不持久化
+  const [daySlider, setDaySlider] = useState<number | null>(null);
+  const [nightSlider, setNightSlider] = useState<number | null>(null);
+
+  // 预览结束时清掉本地虚拟值
+  useEffect(() => {
+    if (previewValue === null) {
+      setDaySlider(null);
+      setNightSlider(null);
+    }
+  }, [previewValue]);
+
   useEffect(() => {
     if (previewValue === null) {
       setGlobalToast({ message: '', visible: false });
@@ -63,10 +75,12 @@ export function GlobalSettingsPanel({
    * 处理亮度滑块变化：
    * - 当前时段滑块：直接写入配置
    * - 跨时段滑块（白天调夜间/夜间调白天）：触发 3 秒预览 + toast 倒计时
+   *   滑块 UI 显示本地虚拟值（不回弹），3 秒后预览结束本地虚拟值清空，恢复原值
    */
   const handleDayChange = (value: number) => {
     if (isNight) {
       // 当前是夜间，调节白天滑块 = 跨时段预览
+      setDaySlider(value);
       onBrightnessPreview?.(value);
     } else {
       onBrightnessChange(value, brightnessConfig.night);
@@ -79,6 +93,7 @@ export function GlobalSettingsPanel({
       onBrightnessChange(brightnessConfig.day, value);
     } else {
       // 当前是白天，调节夜间滑块 = 跨时段预览
+      setNightSlider(value);
       onBrightnessPreview?.(value);
     }
   };
@@ -137,11 +152,11 @@ export function GlobalSettingsPanel({
               type="range"
               min={50}
               max={100}
-              value={brightnessConfig.day}
+              value={daySlider ?? brightnessConfig.day}
               onChange={(e) => handleDayChange(Number(e.target.value))}
               className="global-settings__slider"
             />
-            <span className="global-settings__brightness-value">{brightnessConfig.day}%</span>
+            <span className="global-settings__brightness-value">{daySlider ?? brightnessConfig.day}%</span>
           </div>
           <div className="global-settings__brightness-row">
             <span className="global-settings__brightness-label">
@@ -151,11 +166,11 @@ export function GlobalSettingsPanel({
               type="range"
               min={30}
               max={80}
-              value={brightnessConfig.night}
+              value={nightSlider ?? brightnessConfig.night}
               onChange={(e) => handleNightChange(Number(e.target.value))}
               className="global-settings__slider"
             />
-            <span className="global-settings__brightness-value">{brightnessConfig.night}%</span>
+            <span className="global-settings__brightness-value">{nightSlider ?? brightnessConfig.night}%</span>
           </div>
         </div>
       </div>
