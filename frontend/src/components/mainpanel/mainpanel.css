@@ -69,8 +69,8 @@
 }
 
 .main-panel__settings-btn {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: transparent;
+  border: 0;
   border-radius: 50%;
   width: 42px;
   height: 42px;
@@ -78,9 +78,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s ease, transform 0.1s, box-shadow 0.3s ease;
+  transition: background 0.2s, transform 0.1s;
   color: var(--text-primary);
-  backdrop-filter: blur(8px);
+  flex-shrink: 0;
+}
+
+.main-panel__settings-btn:hover {
+  background: var(--bg-glow-1);
 }
 
 .main-panel__settings-btn:hover {

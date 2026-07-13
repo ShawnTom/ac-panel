@@ -11,6 +11,40 @@
   gap: 12px;
   padding: 0 4px;
   flex-shrink: 0;
+  justify-content: space-between;
+}
+
+.room-list__title {
+  flex: 1;
+  text-align: left;
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+/* 房间列表页右上角：全局设置按钮（无外圆边框，仅 icon，与主页右上角样式一致） */
+.room-list__settings-btn {
+  background: transparent;
+  border: 0;
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.room-list__settings-btn:hover {
+  background: var(--bg-glow-1);
+}
+
+.room-list__settings-btn:active {
+  transform: scale(0.92);
 }
 
 .room-list__back-btn {
@@ -36,13 +70,6 @@
 
 .room-list__back-btn:active {
   transform: scale(0.92);
-}
-
-.room-list__title {
-  font-size: var(--fs-title);
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: 0.5px;
 }
 
 /* 两列网格布局 */

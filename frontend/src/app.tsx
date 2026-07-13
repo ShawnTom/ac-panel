@@ -121,6 +121,7 @@ function App() {
             onRoomSelect={handleRoomSelect}
             onRoomPowerToggle={(room) => handleRoomUpdate({ ...room, power: !room.power })}
             onBack={() => setCurrentView('main')}
+            onSettingsClick={() => setCurrentView('settings')}
           />
         </div>
         <div className="app__view">

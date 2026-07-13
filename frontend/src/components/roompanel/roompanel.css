@@ -6,12 +6,17 @@
   padding-bottom: 22px;
 }
 
-/* 房间页 header：返回按钮在最左，房间名+时间靠右（main-panel__header 仍是 space-between，
-   这里只把 room-info 改成靠右对齐 + 收缩宽度） */
+/* 房间页 header：返回按钮在最左，房间名+时间紧贴返回按钮右侧，间距 12px
+   （覆盖 main-panel__header 默认的 space-between 让两侧都贴边） */
+.room-panel .main-panel__header {
+  justify-content: flex-start;
+  gap: 12px;
+}
+
 .room-panel .main-panel__room-info {
   flex: 0 1 auto;
-  justify-content: flex-end;
   min-width: 0;
+  gap: 12px;
 }
 
 .room-panel__back-btn {
