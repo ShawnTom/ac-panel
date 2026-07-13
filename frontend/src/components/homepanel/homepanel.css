@@ -3,13 +3,14 @@
   flex-direction: column;
   padding: 24px 20px;
   gap: 14px;
+  min-height: 100%;
 }
 
 .home-panel--off {
   opacity: 0.5;
 }
 
-/* ===== 顶部栏: 时间 + 一键开关 ===== */
+/* ===== 顶部栏: 时间 + 全局设置 ===== */
 .home-panel__top-bar {
   display: flex;
   justify-content: space-between;
@@ -17,7 +18,31 @@
   min-height: 64px;
 }
 
-/* 一键启动/关闭按钮 */
+/* 全局设置按钮（无外圆边框，与主页/房间列表一致） */
+.home-panel__settings-btn {
+  background: transparent;
+  border: 0;
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
+  color: var(--text-primary);
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+
+.home-panel__settings-btn:hover {
+  background: var(--bg-glow-1);
+}
+
+.home-panel__settings-btn:active {
+  transform: scale(0.92);
+}
+
+/* 一键启动/关闭按钮（位于底部居中） */
 .home-panel__master-power {
   display: flex;
   align-items: center;
@@ -31,6 +56,8 @@
   font-weight: 600;
   letter-spacing: 0.3px;
   flex-shrink: 0;
+  align-self: center;
+  margin-top: 4px;
   transition: all 0.3s ease;
 }
 
@@ -160,6 +187,7 @@
   flex-direction: column;
   gap: 10px;
   margin-top: 4px;
+  flex: 1;
 }
 
 .home-panel__card-row {

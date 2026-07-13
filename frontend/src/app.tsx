@@ -162,7 +162,7 @@ function App() {
         style={{ transform: `translateX(-${currentIndex * 20}%)` }}
       >
         <div className="app__view">
-          <HomePanel rooms={rooms} settings={globalSettings} onPowerToggle={handlePowerToggle} />
+          <HomePanel rooms={rooms} settings={globalSettings} onPowerToggle={handlePowerToggle} onSettingsClick={() => setCurrentView('settings')} />
         </div>
         <div className="app__view">
           <MainPanel

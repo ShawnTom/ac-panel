@@ -7,6 +7,7 @@ interface HomePanelProps {
   rooms: Room[];
   settings: GlobalSettings;
   onPowerToggle: () => void;
+  onSettingsClick: () => void;
 }
 
 function LocationIcon() {
@@ -37,6 +38,15 @@ function PowerIcon({ spinning = false }: { spinning?: boolean }) {
   );
 }
 
+function GearIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  );
+}
+
 function TempIcon() {
   return (
     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -53,7 +63,7 @@ function HumidityIcon() {
   );
 }
 
-export function HomePanel({ rooms, settings, onPowerToggle }: HomePanelProps) {
+export function HomePanel({ rooms, settings, onPowerToggle, onSettingsClick }: HomePanelProps) {
   const [currentTime, setCurrentTime] = useState('');
   const [currentDate, setCurrentDate] = useState('');
 
@@ -92,14 +102,11 @@ export function HomePanel({ rooms, settings, onPowerToggle }: HomePanelProps) {
           <span className="home-panel__date">{currentDate}</span>
         </div>
         <button
-          className={`home-panel__master-power ${isPoweredOn ? 'home-panel__master-power--on' : 'home-panel__master-power--off'}`}
-          onClick={onPowerToggle}
-          aria-label={isPoweredOn ? '一键关闭' : '一键启动'}
+          className="home-panel__settings-btn"
+          onClick={onSettingsClick}
+          aria-label="Settings"
         >
-          <PowerIcon spinning={isPoweredOn} />
-          <span className="home-panel__master-power-label">
-            {isPoweredOn ? '一键关闭' : '一键启动'}
-          </span>
+          <GearIcon />
         </button>
       </div>
 
@@ -153,6 +160,17 @@ export function HomePanel({ rooms, settings, onPowerToggle }: HomePanelProps) {
           </div>
         </div>
       </div>
+
+      <button
+        className={`home-panel__master-power ${isPoweredOn ? 'home-panel__master-power--on' : 'home-panel__master-power--off'}`}
+        onClick={onPowerToggle}
+        aria-label={isPoweredOn ? '一键关闭' : '一键启动'}
+      >
+        <PowerIcon spinning={isPoweredOn} />
+        <span className="home-panel__master-power-label">
+          {isPoweredOn ? '一键关闭' : '一键启动'}
+        </span>
+      </button>
     </Panel>
   );
 }
