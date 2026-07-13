@@ -1,0 +1,227 @@
+.fan-speed {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 14px 18px;
+  user-select: none;
+  touch-action: none;
+}
+
+/* 整体禁用：弱化视觉 */
+.fan-speed--inactive {
+  opacity: 0.55;
+  filter: saturate(0.6);
+}
+
+.fan-speed--inactive .fan-speed__segment,
+.fan-speed--inactive .fan-speed__step-btn {
+  pointer-events: none;
+}
+
+/* ===== 顶部 display：fan icon + 大数字 ===== */
+.fan-speed__display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.fan-speed__readout {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  line-height: 1;
+}
+
+.fan-speed__value {
+  font-size: 64px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1px;
+  text-shadow: 0 0 18px var(--accent-glow);
+  transition: text-shadow 0.3s ease;
+}
+
+.fan-speed--inactive .fan-speed__value {
+  text-shadow: none;
+}
+
+.fan-speed__unit {
+  font-size: 14px;
+  color: var(--text-secondary);
+  letter-spacing: 4px;
+  font-weight: 600;
+}
+
+.fan-speed__label {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* ===== 风扇 icon ===== */
+.fan-icon {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 8px var(--accent-glow));
+  transition: filter 0.3s ease;
+}
+
+.fan-icon--idle {
+  filter: drop-shadow(0 0 2px var(--accent-glow));
+  opacity: 0.5;
+}
+
+.fan-icon__rotor {
+  animation: fan-spin var(--fan-dur, 1s) linear infinite;
+}
+
+@keyframes fan-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== 控制区：[-]  [█████]  [+] ===== */
+.fan-speed__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.fan-speed__step-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s ease, border-color 0.2s ease,
+    transform 0.1s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.fan-speed__step-btn:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--border-strong);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.fan-speed__step-btn:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.fan-speed__step-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ===== 5 段 segment ===== */
+.fan-speed__segments {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+  height: 56px;
+  padding: 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fan-speed__segments:hover {
+  border-color: var(--border-strong);
+}
+
+.fan-speed__segments:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.fan-speed__segment {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  padding: 6px 2px 4px;
+  border: 0;
+  background: transparent;
+  border-radius: 10px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.1s ease;
+}
+
+.fan-speed__segment:hover:not(:disabled) {
+  background: var(--bg-glow-1);
+  color: var(--text-primary);
+}
+
+.fan-speed__segment:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+/* 段下方的"条"：表示能量柱 */
+.fan-speed__segment-bar {
+  display: block;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--dial-track);
+  transition: background 0.25s ease, box-shadow 0.25s ease, height 0.2s ease;
+}
+
+.fan-speed__segment-num {
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+/* 已激活段（≤ 当前档） */
+.fan-speed__segment--lit {
+  color: var(--accent-primary);
+}
+
+.fan-speed__segment--lit .fan-speed__segment-bar {
+  background: linear-gradient(
+    90deg,
+    var(--accent-primary),
+    var(--accent-secondary)
+  );
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.fan-speed__segment--lit .fan-speed__segment-num {
+  opacity: 1;
+  color: var(--accent-primary);
+}
+
+/* 当前档额外强调 */
+.fan-speed__segment--lit:last-child,
+.fan-speed__segments:hover .fan-speed__segment--lit {
+  /* placeholder — 占位避免空规则警告 */
+}

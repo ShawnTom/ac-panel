@@ -2,7 +2,7 @@ import { useState, useEffect, type ReactElement } from 'react';
 import type { Room, GlobalSettings, ACMode, FanMode } from '../../types';
 import { Panel } from '../shared/panel';
 import { TemperatureDial } from '../temperaturedial/temperaturedial';
-import { FanDial } from '../fandial/fandial';
+import { FanSpeedControl } from '../fanspeedcontrol/fanspeedcontrol';
 import './mainpanel.css';
 
 interface MainPanelProps {
@@ -136,10 +136,11 @@ export function MainPanel({
           className={`main-panel__fan-stage ${(isPoweredOn && isVentMode && fanAdjustable) ? '' : 'main-panel__fan-stage--hidden'}`}
           aria-hidden={!(isPoweredOn && isVentMode && fanAdjustable)}
         >
-          <FanDial
+          <FanSpeedControl
             value={fanSpeed}
             onChange={handleFanSpeedChange}
-            disabled={!isPoweredOn || fanMode === 'auto'}
+            autoMode={fanMode === 'auto'}
+            disabled={!isPoweredOn}
           />
         </div>
 
