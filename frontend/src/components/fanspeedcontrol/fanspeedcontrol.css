@@ -13,8 +13,8 @@
 
 /* 整体禁用：弱化视觉 */
 .fan-speed--inactive {
-  opacity: 0.62;
-  filter: saturate(0.7);
+  opacity: 0.55;
+  filter: saturate(0.6);
 }
 
 .fan-speed--inactive .fan-speed__segment,
@@ -231,82 +231,4 @@
 .fan-speed__segment--lit .fan-speed__segment-num {
   opacity: 1;
   color: var(--accent-primary);
-}
-
-/* =====================================================
- * 自动模式：充电效果跑马灯
- * - 5 个 segment 从左到右依次"充"亮，像电池从 0% 充到 100%
- * - 然后全部瞬间归零，循环
- * - 整体保持 disabled（pointer-events 由 .fan-speed--inactive 处理）
- * ===================================================== */
-.fan-speed--auto .fan-speed__segment {
-  /* 关闭"按档位常亮"的样式，由动画控制 */
-  color: var(--text-muted);
-}
-
-.fan-speed--auto .fan-speed__segment--lit .fan-speed__segment-num {
-  /* 数字也走动画 */
-  color: var(--text-muted);
-  opacity: 0.6;
-  animation: fan-charge-num 2.5s linear infinite;
-  animation-delay: calc(var(--seg-idx, 0) * 0.5s);
-}
-
-/*
- * 充电柱动画：
- * - 每段在 (seg-idx × 0.5s) 时刻从底部"长"到顶部，耗时 0.5s
- * - 之后保持充满到周期末尾 100%
- * - 100% 瞬间归零（下一次循环开始）
- * - 总周期 2.5s：段0 0~0.5s，段1 0.5~1.0s，...，段4 2.0~2.5s
- * 视觉：像 5 个电池依次充到顶 → 全部归零 → 循环
- */
-.fan-speed--auto .fan-speed__segment--lit .fan-speed__segment-bar {
-  background: linear-gradient(
-    180deg,
-    var(--accent-secondary),
-    var(--accent-primary)
-  );
-  box-shadow: 0 0 10px var(--accent-glow);
-  /* 用 transform 缩放从底部往上"充"出来，origin bottom */
-  transform-origin: bottom center;
-  animation: fan-charge-bar 2.5s linear infinite;
-  animation-delay: calc(var(--seg-idx, 0) * 0.5s);
-}
-
-@keyframes fan-charge-bar {
-  0% {
-    transform: scaleY(0);
-    opacity: 0.4;
-  }
-  20% {
-    transform: scaleY(1);
-    opacity: 1;
-  }
-  99% {
-    transform: scaleY(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scaleY(0);
-    opacity: 0.4;
-  }
-}
-
-@keyframes fan-charge-num {
-  0% {
-    color: var(--text-muted);
-    opacity: 0.4;
-  }
-  20% {
-    color: var(--accent-primary);
-    opacity: 1;
-  }
-  99% {
-    color: var(--accent-primary);
-    opacity: 1;
-  }
-  100% {
-    color: var(--text-muted);
-    opacity: 0.4;
-  }
 }
