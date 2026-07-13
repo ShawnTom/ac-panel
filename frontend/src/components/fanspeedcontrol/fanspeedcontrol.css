@@ -232,3 +232,96 @@
   opacity: 1;
   color: var(--accent-primary);
 }
+
+/* =====================================================
+ * 自动模式：5 段"充电"效果跑马灯（纯 CSS 实现，无 inline style）
+ * - 用 :nth-child 选择器分别设置 animation-delay
+ * - 用 box-shadow + background 透明度脉冲，避开 transform: scaleY(0) 黑屏风险
+ * - 总周期 2.5s，每段延迟 0.5s（段1先亮，段5最后亮）
+ * - 整体保持 disabled（pointer-events 由 .fan-speed--inactive 处理）
+ * ===================================================== */
+.fan-speed--auto .fan-speed__segment--lit .fan-speed__segment-bar {
+  animation: fan-charge-pulse 2.5s linear infinite;
+}
+
+.fan-speed--auto .fan-speed__segment--lit .fan-speed__segment-num {
+  animation: fan-charge-pulse-color 2.5s linear infinite;
+}
+
+/* 5 段依次亮起：nth-child 1 最先，nth-child 5 最后 */
+.fan-speed--auto .fan-speed__segment:nth-child(1).fan-speed__segment--lit .fan-speed__segment-bar,
+.fan-speed--auto .fan-speed__segment:nth-child(1).fan-speed__segment--lit .fan-speed__segment-num {
+  animation-delay: 0s;
+}
+.fan-speed--auto .fan-speed__segment:nth-child(2).fan-speed__segment--lit .fan-speed__segment-bar,
+.fan-speed--auto .fan-speed__segment:nth-child(2).fan-speed__segment--lit .fan-speed__segment-num {
+  animation-delay: 0.5s;
+}
+.fan-speed--auto .fan-speed__segment:nth-child(3).fan-speed__segment--lit .fan-speed__segment-bar,
+.fan-speed--auto .fan-speed__segment:nth-child(3).fan-speed__segment--lit .fan-speed__segment-num {
+  animation-delay: 1s;
+}
+.fan-speed--auto .fan-speed__segment:nth-child(4).fan-speed__segment--lit .fan-speed__segment-bar,
+.fan-speed--auto .fan-speed__segment:nth-child(4).fan-speed__segment--lit .fan-speed__segment-num {
+  animation-delay: 1.5s;
+}
+.fan-speed--auto .fan-speed__segment:nth-child(5).fan-speed__segment--lit .fan-speed__segment-bar,
+.fan-speed--auto .fan-speed__segment:nth-child(5).fan-speed__segment--lit .fan-speed__segment-num {
+  animation-delay: 2s;
+}
+
+/*
+ * 充电脉冲：用 background + box-shadow 在 dim 和 lit 状态间切换
+ * 0~20%: 暗到亮 (像充电刚开始)
+ * 20~80%: 保持亮 (充电完成状态)
+ * 80~100%: 亮到暗 (放电回到初始)
+ */
+@keyframes fan-charge-pulse {
+  0% {
+    background: var(--dial-track);
+    box-shadow: none;
+    opacity: 0.5;
+  }
+  20% {
+    background: linear-gradient(
+      180deg,
+      var(--accent-secondary),
+      var(--accent-primary)
+    );
+    box-shadow: 0 0 10px var(--accent-glow);
+    opacity: 1;
+  }
+  80% {
+    background: linear-gradient(
+      180deg,
+      var(--accent-secondary),
+      var(--accent-primary)
+    );
+    box-shadow: 0 0 10px var(--accent-glow);
+    opacity: 1;
+  }
+  100% {
+    background: var(--dial-track);
+    box-shadow: none;
+    opacity: 0.5;
+  }
+}
+
+@keyframes fan-charge-pulse-color {
+  0% {
+    color: var(--text-muted);
+    opacity: 0.5;
+  }
+  20% {
+    color: var(--accent-primary);
+    opacity: 1;
+  }
+  80% {
+    color: var(--accent-primary);
+    opacity: 1;
+  }
+  100% {
+    color: var(--text-muted);
+    opacity: 0.5;
+  }
+}

@@ -93,12 +93,13 @@ export function FanSpeedControl({
 
   return (
     <div
-      className={`fan-speed ${isInactive ? 'fan-speed--inactive' : ''}`}
+      className={`fan-speed ${isInactive ? 'fan-speed--inactive' : ''} ${autoMode ? 'fan-speed--auto' : ''}`}
       data-active-level={safe}
     >
-      {/* 顶部：风 icon + 大档位数字 + 单位（同一行，左右居中） */}
+      {/* 顶部：风 icon + 大档位数字 + 单位（同一行，左右居中）
+          FanIcon 的 active 只看 disabled（断电才停），自动模式时依然保持转动 */}
       <div className="fan-speed__display">
-        <FanIcon level={safe} active={!isInactive} />
+        <FanIcon level={safe} active={!disabled} autoMode={autoMode} />
         <div className="fan-speed__readout">
           <span className="fan-speed__value">{safe}</span>
           <span className="fan-speed__unit">档</span>
@@ -184,14 +185,16 @@ function PlusIcon() {
 
 /**
  * 旋转风叶 icon：
- * - 档位越高，扇叶越多/越"实"，旋转越快
- * - 关闭态时静止、半透明（用 .fan-icon--idle class 关闭 animation，避免 0s 动画副作用）
+ * - 手动模式：档位越高，扇叶越多/越"实"，旋转越快
+ * - 自动模式（autoMode=true）：保持中等固定速度旋转
+ * - 关闭态（active=false）：静止、半透明
  */
-function FanIcon({ level, active }: { level: number; active: boolean }) {
+function FanIcon({ level, active, autoMode = false }: { level: number; active: boolean; autoMode?: boolean }) {
   const l = Math.max(1, Math.min(LEVELS, level));
   // 不同档位扇叶数不同：1=2 叶, 2=3 叶, 3=3 叶, 4=4 叶, 5=4 叶
   const bladeCount = l <= 1 ? 2 : l <= 3 ? 3 : 4;
-  const dur = active ? Math.max(0.4, 1.6 - l * 0.25) : undefined;
+  // 自动模式固定中等速度；手动模式按档位递增转速；关闭态不传 dur（用 class 关 animation）
+  const dur = !active ? undefined : autoMode ? 1.2 : Math.max(0.4, 1.6 - l * 0.25);
 
   return (
     <div
