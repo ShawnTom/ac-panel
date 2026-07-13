@@ -123,7 +123,8 @@
   inset: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;             /* 偏下，让 FanSpeedControl 靠近下方 chip */
+  padding-bottom: 4px;                /* 与 chip 之间留 4px 净距 */
   opacity: 1;
   transform: scale(1);
   filter: blur(0);
@@ -150,10 +151,9 @@
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 999px;
-  margin: -40px auto 0;                /* 风量调节变扁后，-40px 即可让 chip 紧贴风量条底部数字 */
+  margin: 0 auto;                       /* 正常布局流，不再用负 margin 覆盖上层 */
   width: fit-content;
-  position: relative;
-  z-index: 1;
+  flex-shrink: 0;                       /* 防止被挤压 */
 }
 
 .main-panel__mode-toggle {
